@@ -2,7 +2,6 @@ use crate::{error::MetricError, utils};
 use getset::Getters;
 use serde::Serialize;
 use std::path::Path;
-use walkdir::WalkDir;
 
 enum DMIType {
     BiosDate,
@@ -176,7 +175,7 @@ pub fn collect() -> DMI {
         return dmi;
     }
 
-    for device in dmi_devices(dmi_class_path) {
+    for device in utils::list_dir_content(dmi_class_path, "", "id") {
         match DMIType::from(device.as_str()) {
             DMIType::BiosDate => {
                 dmi.bios_date = utils::collect_info_string(&device, dmi_class_path);
@@ -263,21 +262,6 @@ pub fn collect() -> DMI {
     }
 
     dmi
-}
-
-fn dmi_devices(class_path: &Path) -> Vec<String> {
-    let mut devices = Vec::new();
-
-    for tdev in WalkDir::new(class_path).into_iter().filter_map(|e| e.ok()) {
-        if tdev.file_name() == "id" {
-            continue;
-        }
-
-        let tdev_name = tdev.file_name().to_str().unwrap_or_default();
-        devices.push(tdev_name.to_string());
-    }
-
-    devices
 }
 
 #[cfg(test)]
