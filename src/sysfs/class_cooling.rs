@@ -64,7 +64,7 @@ pub fn collect() -> Vec<Cooling> {
     let mut cooling_devs = Vec::new();
     let cooling_class_path = Path::new("/sys/class/thermal/");
 
-    for cdevice in cooling_devices(cooling_class_path) {
+    for cdevice in utils::list_dir_content(cooling_class_path, "cooling_device", "thermal") {
         let mut cooling_device = Cooling::new(&cdevice);
         let mut cdev_path = PathBuf::from(cooling_class_path);
 
@@ -107,24 +107,6 @@ pub fn collect() -> Vec<Cooling> {
     }
 
     cooling_devs
-}
-
-fn cooling_devices(class_path: &Path) -> Vec<String> {
-    let mut devices = Vec::new();
-
-    for tdev in WalkDir::new(class_path).into_iter().filter_map(|e| e.ok()) {
-        if tdev.file_name() == "thermal" {
-            continue;
-        }
-
-        let tdev_name = tdev.file_name().to_str().unwrap_or_default();
-
-        if tdev_name.starts_with("cooling_device") {
-            devices.push(tdev_name.to_string());
-        }
-    }
-
-    devices
 }
 
 #[cfg(test)]

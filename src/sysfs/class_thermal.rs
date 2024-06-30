@@ -85,7 +85,7 @@ pub fn collect() -> Vec<ThermalZone> {
     let mut thermal_zone_devices = Vec::new();
     let thermal_zone_class_path = Path::new("/sys/class/thermal/");
 
-    for tdevice in thermal_devices(thermal_zone_class_path) {
+    for tdevice in utils::list_dir_content(thermal_zone_class_path, "thermal_zone", "thermal") {
         let mut thermal_device = ThermalZone::new(&tdevice);
         let mut tdev_path = PathBuf::from(thermal_zone_class_path);
 
@@ -145,24 +145,6 @@ pub fn collect() -> Vec<ThermalZone> {
     }
 
     thermal_zone_devices
-}
-
-fn thermal_devices(class_path: &Path) -> Vec<String> {
-    let mut devices = Vec::new();
-
-    for tdev in WalkDir::new(class_path).into_iter().filter_map(|e| e.ok()) {
-        if tdev.file_name() == "thermal" {
-            continue;
-        }
-
-        let tdev_name = tdev.file_name().to_str().unwrap_or_default();
-
-        if tdev_name.starts_with("thermal_zone") {
-            devices.push(tdev_name.to_string());
-        }
-    }
-
-    devices
 }
 
 #[cfg(test)]

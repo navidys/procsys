@@ -138,7 +138,7 @@ impl Watchdog {
 pub fn collect() -> Vec<Watchdog> {
     let mut devices = Vec::new();
     let watchdog_class_path = Path::new("/sys/class/watchdog/");
-    for device in watchdog_devices(watchdog_class_path) {
+    for device in utils::list_dir_content(watchdog_class_path, "", "watchdog") {
         let mut watchdog_dev = Watchdog::new(device.to_owned());
 
         let mut wdev_path = PathBuf::from(watchdog_class_path);
@@ -223,26 +223,6 @@ pub fn collect() -> Vec<Watchdog> {
         }
 
         devices.push(watchdog_dev);
-    }
-
-    devices
-}
-
-fn watchdog_devices(class_path: &Path) -> Vec<String> {
-    let mut devices = Vec::new();
-
-    for wdev in WalkDir::new(class_path).into_iter().filter_map(|e| e.ok()) {
-        if wdev.file_name() == "watchdog" {
-            continue;
-        }
-
-        devices.push(
-            wdev.file_name()
-                .to_str()
-                .unwrap_or_default()
-                .trim()
-                .to_string(),
-        )
     }
 
     devices
