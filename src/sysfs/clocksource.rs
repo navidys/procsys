@@ -22,7 +22,7 @@ impl ClocksourceInfo {
     }
 }
 
-/// Clocksource contains a clocksource information.
+/// Clocksource contains a clocksource information read from '/sys/devices/system/clocksource'
 /// # Example
 /// ```
 /// use procsys::sysfs::clocksource;

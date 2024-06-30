@@ -55,7 +55,7 @@ impl DMIType {
     }
 }
 
-/// The DMI contains the content of Desktop Management Interface.
+/// The DMI contains the content of Desktop Management Interface from files in in /sys/class/dmi/id
 /// # Example
 /// ```
 /// use procsys::sysfs::class_dmi;

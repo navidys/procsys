@@ -24,7 +24,7 @@ impl CoolingInfo {
     }
 }
 
-/// Cooling contains a cooling device information.
+/// Cooling contains a cooling device information from files in /sys/class/thermal/cooling_device[0-9]*
 /// # Example
 /// ```
 /// use procsys::sysfs::class_cooling;

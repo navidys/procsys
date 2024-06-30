@@ -46,7 +46,7 @@ impl WatchdogInfo {
     }
 }
 
-/// Watchdog contains a watchdog device stat information.
+/// Watchdog contains a watchdog device stat information from files in /sys/class/watchdog
 /// # Example
 /// ```
 /// use procsys::sysfs::class_watchdog;
