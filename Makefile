@@ -33,6 +33,20 @@ codespell: ## Run codespell
 	@echo "running codespell"
 	@codespell -S ./target,./targets -L crate
 
+#=================================================
+# Publish crate
+#=================================================
+
+.PHONY: crate-publish
+crate-publish: ## Publish crate
+	@if [ "v$(CRATE_VERSION)" != "$(GIT_TAG)" ]; then\
+		echo "Git tag is not equivalent to the version set in Cargo.toml. Please checkout the correct tag";\
+		exit 1;\
+	fi
+	@echo "It is expected that you have already done 'cargo login' before running this command. If not command may fail later"
+	$(CARGO) publish --dry-run
+	$(CARGO) publish
+
 
 .PHONY: clean
 clean: ## Cleanup
