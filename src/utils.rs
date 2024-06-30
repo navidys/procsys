@@ -32,6 +32,19 @@ pub fn collect_info_i64(filename: &str, dir_path: &Path) -> Option<i64> {
     None
 }
 
+pub fn collect_info_u64(filename: &str, dir_path: &Path) -> Option<u64> {
+    if let Some(c) = collect_info_string(filename, dir_path) {
+        if !c.is_empty() {
+            match c.parse::<u64>() {
+                Ok(i) => return Some(i),
+                Err(err) => log::error!("{}", err),
+            }
+        }
+    }
+
+    None
+}
+
 pub fn list_dir_content(
     dir_path: &Path,
     include_pattern: &str,

@@ -65,7 +65,7 @@ pub struct ThermalZone {
     mode: Option<bool>,
 
     #[getset(get = "pub")]
-    passive: Option<i64>,
+    passive: Option<u64>,
 }
 
 impl ThermalZone {
@@ -121,7 +121,7 @@ pub fn collect() -> Vec<ThermalZone> {
                 }
                 ThermalZoneInfo::Passive => {
                     thermal_device.passive =
-                        utils::collect_info_i64(&tdev_info_name, tdev_path.as_path());
+                        utils::collect_info_u64(&tdev_info_name, tdev_path.as_path());
                 }
                 ThermalZoneInfo::Policy => {
                     if let Some(c) =
