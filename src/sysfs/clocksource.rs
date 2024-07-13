@@ -1,6 +1,5 @@
 use std::{fs, path::Path};
 
-use getset::Getters;
 use serde::Serialize;
 use walkdir::WalkDir;
 
@@ -22,30 +21,12 @@ impl ClocksourceInfo {
     }
 }
 
-/// Clocksource contains a clocksource information.
-/// # Example
-/// ```
-/// use procsys::sysfs::clocksource;
-///
-/// let clocksources = clocksource::collect();
-///
-/// for clock_src in clocksources {
-///     println!("name: {}", clock_src.name());
-///     println!("available clocksource: {:?}", clock_src.available_clocksource());
-///     println!("current clocksource: {}", clock_src.current_clocksource());
-/// }
-///
-/// ```
-#[derive(Debug, Serialize, Clone, Getters)]
+/// Clocksource contains a clocksource information read from '/sys/devices/system/clocksource'
+#[derive(Debug, Serialize, Clone)]
 pub struct Clocksource {
-    #[getset(get = "pub")]
-    name: String,
-
-    #[getset(get = "pub")]
-    available_clocksource: Vec<String>,
-
-    #[getset(get = "pub")]
-    current_clocksource: String,
+    pub name: String,
+    pub available_clocksource: Vec<String>,
+    pub current_clocksource: String,
 }
 
 impl Clocksource {
@@ -62,6 +43,20 @@ impl Clocksource {
     }
 }
 
+/// collects clocksources information
+/// # Example
+/// ```
+/// use procsys::sysfs::clocksource;
+///
+/// let clocksources = clocksource::collect();
+///
+/// for clock_src in clocksources {
+///     println!("name: {}", clock_src.name);
+///     println!("available clocksource: {:?}", clock_src.available_clocksource);
+///     println!("current clocksource: {}", clock_src.current_clocksource);
+/// }
+///
+/// ```
 pub fn collect() -> Vec<Clocksource> {
     let mut clock_sources = Vec::new();
     let clock_source_path = Path::new("/sys/devices/system/clocksource");
@@ -144,9 +139,9 @@ mod tests {
         assert!(!clock_sources.is_empty());
 
         for clock_src in clock_sources {
-            assert!(!clock_src.name().is_empty());
-            assert!(!clock_src.available_clocksource().is_empty());
-            assert!(!clock_src.current_clocksource().is_empty());
+            assert!(!clock_src.name.is_empty());
+            assert!(!clock_src.available_clocksource.is_empty());
+            assert!(!clock_src.current_clocksource.is_empty());
         }
     }
 }

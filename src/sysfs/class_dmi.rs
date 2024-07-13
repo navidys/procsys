@@ -1,5 +1,4 @@
 use crate::{error::MetricError, utils};
-use getset::Getters;
 use serde::Serialize;
 use std::path::Path;
 
@@ -55,85 +54,30 @@ impl DMIType {
     }
 }
 
-/// The DMI contains the content of Desktop Management Interface.
-/// # Example
-/// ```
-/// use procsys::sysfs::class_dmi;
-///
-/// let dmi_info = class_dmi::collect();
-///
-/// println!("bios date: {}", dmi_info.bios_date().to_owned().unwrap_or_default());
-/// println!("board serial: {}", dmi_info.board_serial().to_owned().unwrap_or_default());
-///
-/// // print all dmi information in json format
-/// let json_output = serde_json::to_string_pretty(&dmi_info).unwrap();
-/// println!("{}", json_output);
-///
-/// ```
-#[derive(Debug, Serialize, Clone, Getters)]
+/// The DMI contains the content of Desktop Management Interface from files in in /sys/class/dmi/id
+#[derive(Debug, Serialize, Clone)]
 pub struct DMI {
-    #[getset(get = "pub")]
-    bios_date: Option<String>,
-
-    #[getset(get = "pub")]
-    bios_release: Option<String>,
-
-    #[getset(get = "pub")]
-    bios_vendor: Option<String>,
-
-    #[getset(get = "pub")]
-    bios_version: Option<String>,
-
-    #[getset(get = "pub")]
-    board_asset_tag: Option<String>,
-
-    #[getset(get = "pub")]
-    board_name: Option<String>,
-
-    #[getset(get = "pub")]
-    board_serial: Option<String>,
-
-    #[getset(get = "pub")]
-    board_vendor: Option<String>,
-
-    #[getset(get = "pub")]
-    board_version: Option<String>,
-
-    #[getset(get = "pub")]
-    chassis_asset_tag: Option<String>,
-
-    #[getset(get = "pub")]
-    chassis_serial: Option<String>,
-
-    #[getset(get = "pub")]
-    chassis_type: Option<String>,
-
-    #[getset(get = "pub")]
-    chassis_vendor: Option<String>,
-
-    #[getset(get = "pub")]
-    chassis_version: Option<String>,
-
-    #[getset(get = "pub")]
-    product_family: Option<String>,
-
-    #[getset(get = "pub")]
-    product_name: Option<String>,
-
-    #[getset(get = "pub")]
-    product_serial: Option<String>,
-
-    #[getset(get = "pub")]
-    product_sku: Option<String>,
-
-    #[getset(get = "pub")]
-    product_uuid: Option<String>,
-
-    #[getset(get = "pub")]
-    product_version: Option<String>,
-
-    #[getset(get = "pub")]
-    system_vendor: Option<String>,
+    pub bios_date: Option<String>,
+    pub bios_release: Option<String>,
+    pub bios_vendor: Option<String>,
+    pub bios_version: Option<String>,
+    pub board_asset_tag: Option<String>,
+    pub board_name: Option<String>,
+    pub board_serial: Option<String>,
+    pub board_vendor: Option<String>,
+    pub board_version: Option<String>,
+    pub chassis_asset_tag: Option<String>,
+    pub chassis_serial: Option<String>,
+    pub chassis_type: Option<String>,
+    pub chassis_vendor: Option<String>,
+    pub chassis_version: Option<String>,
+    pub product_family: Option<String>,
+    pub product_name: Option<String>,
+    pub product_serial: Option<String>,
+    pub product_sku: Option<String>,
+    pub product_uuid: Option<String>,
+    pub product_version: Option<String>,
+    pub system_vendor: Option<String>,
 }
 
 impl DMI {
@@ -164,7 +108,18 @@ impl DMI {
     }
 }
 
-/// attempts to collect dmi information.
+/// attempts to collect dmi information
+/// # Example
+/// ```
+/// use procsys::sysfs::class_dmi;
+///
+/// let dmi_info = class_dmi::collect();
+///
+/// // print all dmi information in json format
+/// let json_output = serde_json::to_string_pretty(&dmi_info).unwrap();
+/// println!("{}", json_output);
+///
+/// ```
 pub fn collect() -> DMI {
     let mut dmi = DMI::new();
 

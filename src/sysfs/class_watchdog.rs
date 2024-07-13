@@ -1,6 +1,5 @@
 use std::path::{Path, PathBuf};
 
-use getset::Getters;
 use serde::Serialize;
 use walkdir::WalkDir;
 
@@ -46,71 +45,24 @@ impl WatchdogInfo {
     }
 }
 
-/// Watchdog contains a watchdog device stat information.
-/// # Example
-/// ```
-/// use procsys::sysfs::class_watchdog;
-///
-/// let watchdog_devices = class_watchdog::collect();
-///
-/// for wdev in &watchdog_devices {
-///     println!("name: {}", wdev.name());
-///     println!("timeout: {}", wdev.timeout().unwrap_or_default());
-///     println!("min_timeout: {}", wdev.min_timeout().unwrap_or_default());
-///     println!("max_timeout: {}", wdev.max_timeout().unwrap_or_default());
-/// }
-///
-/// // print all watchdog devices information in json format
-/// let json_output = serde_json::to_string_pretty(&watchdog_devices).unwrap();
-/// println!("{}", json_output);
-///
-/// ```
-#[derive(Debug, Serialize, Clone, Getters)]
+/// Watchdog contains a watchdog device stat information from files in /sys/class/watchdog
+#[derive(Debug, Serialize, Clone)]
 pub struct Watchdog {
-    #[getset(get = "pub")]
-    name: String,
-
-    #[getset(get = "pub")]
-    boot_status: Option<i64>,
-
-    #[getset(get = "pub")]
-    options: Option<String>,
-
-    #[getset(get = "pub")]
-    fw_version: Option<i64>,
-
-    #[getset(get = "pub")]
-    identity: Option<String>,
-
-    #[getset(get = "pub")]
-    nowayout: Option<i64>,
-
-    #[getset(get = "pub")]
-    state: Option<String>,
-
-    #[getset(get = "pub")]
-    status: Option<String>,
-
-    #[getset(get = "pub")]
-    timeleft: Option<i64>,
-
-    #[getset(get = "pub")]
-    timeout: Option<i64>,
-
-    #[getset(get = "pub")]
-    min_timeout: Option<i64>,
-
-    #[getset(get = "pub")]
-    max_timeout: Option<i64>,
-
-    #[getset(get = "pub")]
-    pretimeout: Option<i64>,
-
-    #[getset(get = "pub")]
-    pretimeout_governor: Option<String>,
-
-    #[getset(get = "pub")]
-    access_cs0: Option<i64>,
+    pub name: String,
+    pub boot_status: Option<i64>,
+    pub options: Option<String>,
+    pub fw_version: Option<i64>,
+    pub identity: Option<String>,
+    pub nowayout: Option<i64>,
+    pub state: Option<String>,
+    pub status: Option<String>,
+    pub timeleft: Option<i64>,
+    pub timeout: Option<i64>,
+    pub min_timeout: Option<i64>,
+    pub max_timeout: Option<i64>,
+    pub pretimeout: Option<i64>,
+    pub pretimeout_governor: Option<String>,
+    pub access_cs0: Option<i64>,
 }
 
 impl Watchdog {
@@ -135,6 +87,25 @@ impl Watchdog {
     }
 }
 
+/// collects watchdog devices information.
+/// # Example
+/// ```
+/// use procsys::sysfs::class_watchdog;
+///
+/// let watchdog_devices = class_watchdog::collect();
+///
+/// for wdev in &watchdog_devices {
+///     println!("name: {}", wdev.name);
+///     println!("timeout: {}", wdev.timeout.unwrap_or_default());
+///     println!("min_timeout: {}", wdev.min_timeout.unwrap_or_default());
+///     println!("max_timeout: {}", wdev.max_timeout.unwrap_or_default());
+/// }
+///
+/// // print all watchdog devices information in json format
+/// let json_output = serde_json::to_string_pretty(&watchdog_devices).unwrap();
+/// println!("{}", json_output);
+///
+/// ```
 pub fn collect() -> Vec<Watchdog> {
     let mut devices = Vec::new();
     let watchdog_class_path = Path::new("/sys/class/watchdog/");

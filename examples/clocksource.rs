@@ -6,12 +6,12 @@ fn main() {
     let clocksources = sysfs::clocksource::collect();
 
     for clock_src in &clocksources {
-        println!("name: {}", clock_src.name());
+        println!("name: {}", clock_src.name);
         println!(
             "available clocksource: {}",
-            clock_src.available_clocksource().join(" "),
+            clock_src.available_clocksource.join(" "),
         );
-        println!("current clocksource: {}", clock_src.current_clocksource());
+        println!("current clocksource: {}", clock_src.current_clocksource);
     }
 
     // print all clocksources information in json output
