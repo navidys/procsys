@@ -6,10 +6,10 @@ fn main() {
     let thermal_devices = class_thermal::collect();
 
     for tdev in &thermal_devices {
-        println!("name: {}", tdev.name());
-        println!("temperature: {}", tdev.temp());
-        println!("type: {}", tdev.zone_type());
-        println!("policy: {}", tdev.zone_type());
+        println!("name: {}", tdev.name);
+        println!("temperature: {}", tdev.temp);
+        println!("type: {}", tdev.zone_type);
+        println!("policy: {}", tdev.zone_type);
     }
 
     // print all thermal devices information in json output

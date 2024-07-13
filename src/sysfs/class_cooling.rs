@@ -1,6 +1,5 @@
 use std::path::{Path, PathBuf};
 
-use getset::Getters;
 use serde::Serialize;
 use walkdir::WalkDir;
 
@@ -25,28 +24,12 @@ impl CoolingInfo {
 }
 
 /// Cooling contains a cooling device information from files in /sys/class/thermal/cooling_device[0-9]*
-/// # Example
-/// ```
-/// use procsys::sysfs::class_cooling;
-///
-/// let cooling_devices = class_cooling::collect();
-/// let json_output = serde_json::to_string_pretty(&cooling_devices).unwrap();
-/// println!("{}", json_output);
-///
-/// ```
-#[derive(Debug, Serialize, Clone, Getters)]
+#[derive(Debug, Serialize, Clone)]
 pub struct Cooling {
-    #[getset(get = "pub")]
-    name: String,
-
-    #[getset(get = "pub")]
-    cooling_type: String,
-
-    #[getset(get = "pub")]
-    max_state: i64,
-
-    #[getset(get = "pub")]
-    cur_state: i64,
+    pub name: String,
+    pub cooling_type: String,
+    pub max_state: i64,
+    pub cur_state: i64,
 }
 
 impl Cooling {
@@ -60,6 +43,16 @@ impl Cooling {
     }
 }
 
+/// collects cooling devices information
+/// # Example
+/// ```
+/// use procsys::sysfs::class_cooling;
+///
+/// let cooling_devices = class_cooling::collect();
+/// let json_output = serde_json::to_string_pretty(&cooling_devices).unwrap();
+/// println!("{}", json_output);
+///
+/// ```
 pub fn collect() -> Vec<Cooling> {
     let mut cooling_devs = Vec::new();
     let cooling_class_path = Path::new("/sys/class/thermal/");

@@ -1,6 +1,5 @@
 use std::path::{Path, PathBuf};
 
-use getset::Getters;
 use serde::Serialize;
 use walkdir::WalkDir;
 
@@ -29,43 +28,14 @@ impl ThermalZoneInfo {
 }
 
 /// ThermalZone contains info from files in /sys/class/thermal/thermal_zoneX.
-/// #Example
-/// ```
-/// use procsys::sysfs::class_thermal;
-///
-///let thermal_devices = class_thermal::collect();
-///
-/// for tdev in &thermal_devices {
-///     println!("name: {}", tdev.name());
-///     println!("temperature: {}", tdev.temp());
-///     println!("type: {}", tdev.zone_type());
-///     println!("policy: {}", tdev.zone_type());
-/// }
-///
-/// // print all thermal devices information in json format
-/// let json_output = serde_json::to_string_pretty(&thermal_devices).unwrap();
-/// println!("{}", json_output);
-///
-/// ```
-#[derive(Debug, Serialize, Clone, Getters)]
+#[derive(Debug, Serialize, Clone)]
 pub struct ThermalZone {
-    #[getset(get = "pub")]
-    name: String,
-
-    #[getset(get = "pub")]
-    zone_type: String,
-
-    #[getset(get = "pub")]
-    policy: String,
-
-    #[getset(get = "pub")]
-    temp: i64,
-
-    #[getset(get = "pub")]
-    mode: Option<bool>,
-
-    #[getset(get = "pub")]
-    passive: Option<u64>,
+    pub name: String,
+    pub zone_type: String,
+    pub policy: String,
+    pub temp: i64,
+    pub mode: Option<bool>,
+    pub passive: Option<u64>,
 }
 
 impl ThermalZone {
@@ -81,6 +51,25 @@ impl ThermalZone {
     }
 }
 
+/// collects thermal devices information.
+/// #Example
+/// ```
+/// use procsys::sysfs::class_thermal;
+///
+///let thermal_devices = class_thermal::collect();
+///
+/// for tdev in &thermal_devices {
+///     println!("name: {}", tdev.name);
+///     println!("temperature: {}", tdev.temp);
+///     println!("type: {}", tdev.zone_type);
+///     println!("policy: {}", tdev.zone_type);
+/// }
+///
+/// // print all thermal devices information in json format
+/// let json_output = serde_json::to_string_pretty(&thermal_devices).unwrap();
+/// println!("{}", json_output);
+///
+/// ```
 pub fn collect() -> Vec<ThermalZone> {
     let mut thermal_zone_devices = Vec::new();
     let thermal_zone_class_path = Path::new("/sys/class/thermal/");
