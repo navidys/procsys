@@ -1,4 +1,8 @@
-use std::{fs, path::Path};
+use std::{
+    fs::{self, File},
+    io::{BufRead, BufReader},
+    path::{Path, PathBuf},
+};
 
 use walkdir::WalkDir;
 
@@ -71,4 +75,23 @@ pub fn list_dir_content(
     }
 
     content
+}
+
+pub fn read_file_lines(filename: &str) -> Vec<String> {
+    let mut result = Vec::new();
+
+    match File::open(filename) {
+        Ok(file) => {
+            let reader = BufReader::new(file);
+            for line_result in reader.lines() {
+                match line_result {
+                    Ok(line) => result.push(line),
+                    Err(err) => log::error!("{}", err),
+                }
+            }
+        }
+        Err(err) => log::error!("{}", MetricError::IOError(PathBuf::from(filename), err)),
+    }
+
+    result
 }
