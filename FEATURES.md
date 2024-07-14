@@ -1,4 +1,6 @@
 Supported Features
+* `/net/`
+    * ✅ `dev`
 
 * `/sys/class/`
     * ✅ `dmi/id`
