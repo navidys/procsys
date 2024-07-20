@@ -73,6 +73,7 @@ pub fn collect() -> Vec<NetDev> {
         let fields: Vec<&str> = line.trim().split(' ').filter(|s| !s.is_empty()).collect();
 
         if fields.len() != 17 {
+            log::error!("invalid network field number {}", fields.len());
             continue;
         }
 
@@ -108,27 +109,28 @@ mod tests {
 
     #[test]
     fn net_devices() {
+        let minvalue = 0;
         let ndevices = collect();
         assert!(!ndevices.is_empty());
 
         for net_dev in ndevices {
             assert!(!net_dev.name.is_empty());
-            assert!(net_dev.rx_bytes.ge(&0));
-            assert!(net_dev.rx_packets.ge(&0));
-            assert!(net_dev.rx_errors.ge(&0));
-            assert!(net_dev.rx_dropped.ge(&0));
-            assert!(net_dev.rx_fifo.ge(&0));
-            assert!(net_dev.rx_frame.ge(&0));
-            assert!(net_dev.rx_compressed.ge(&0));
-            assert!(net_dev.rx_multicast.ge(&0));
-            assert!(net_dev.tx_bytes.ge(&0));
-            assert!(net_dev.tx_packets.ge(&0));
-            assert!(net_dev.tx_errors.ge(&0));
-            assert!(net_dev.tx_dropped.ge(&0));
-            assert!(net_dev.tx_fifo.ge(&0));
-            assert!(net_dev.tx_collisions.ge(&0));
-            assert!(net_dev.tx_carrier.ge(&0));
-            assert!(net_dev.tx_compressed.ge(&0));
+            assert!(net_dev.rx_bytes.ge(&minvalue));
+            assert!(net_dev.rx_packets.ge(&minvalue));
+            assert!(net_dev.rx_errors.ge(&minvalue));
+            assert!(net_dev.rx_dropped.ge(&minvalue));
+            assert!(net_dev.rx_fifo.ge(&minvalue));
+            assert!(net_dev.rx_frame.ge(&minvalue));
+            assert!(net_dev.rx_compressed.ge(&minvalue));
+            assert!(net_dev.rx_multicast.ge(&minvalue));
+            assert!(net_dev.tx_bytes.ge(&minvalue));
+            assert!(net_dev.tx_packets.ge(&minvalue));
+            assert!(net_dev.tx_errors.ge(&minvalue));
+            assert!(net_dev.tx_dropped.ge(&minvalue));
+            assert!(net_dev.tx_fifo.ge(&minvalue));
+            assert!(net_dev.tx_collisions.ge(&minvalue));
+            assert!(net_dev.tx_carrier.ge(&minvalue));
+            assert!(net_dev.tx_compressed.ge(&minvalue));
         }
     }
 }
