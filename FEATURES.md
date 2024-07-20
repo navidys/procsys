@@ -1,6 +1,8 @@
 Supported Features
 * ✅ `/loadavg`
 
+* ✅ `/meminfo`
+
 * ✅ `/net/dev`
 
 * ✅ `/sys/class/dmi/id`

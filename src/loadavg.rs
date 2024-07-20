@@ -22,7 +22,7 @@ impl LoadAvg {
     }
 }
 
-/// colelcts the load average information
+/// collects the load average information
 /// # Example
 /// ```
 /// use procsys::loadavg;

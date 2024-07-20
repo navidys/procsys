@@ -95,3 +95,16 @@ pub fn read_file_lines(filename: &str) -> Vec<String> {
 
     result
 }
+
+pub fn convert_to_bytes(num: u64, unit: &str) -> Option<u64> {
+    match unit {
+        "B" => Some(num),
+        "KiB" | "kiB" | "kB" | "KB" => Some(num * 1024),
+        "MiB" | "miB" | "MB" | "mB" => Some(num * 1024 * 1024),
+        "GiB" | "giB" | "GB" | "gB" => Some(num * 1024 * 1024 * 1024),
+        _ => {
+            log::error!("invalid unit: {}", unit);
+            None
+        }
+    }
+}
