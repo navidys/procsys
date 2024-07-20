@@ -1,9 +1,16 @@
 Supported Features
-* ✅ `/loadavg`
+* ✅ `/proc/loadavg`
 
-* ✅ `/meminfo`
+* ✅ `/proc/meminfo`
 
-* ✅ `/net/dev`
+* ✅ `/proc/net/dev`
+
+* ✅ `/proc/sys/kernel/random`
+    * entropy_avail
+    * poolsize
+    * urandom_min_reseed_secs
+    * write_wakeup_threshold
+    * read_wakeup_threshold
 
 * ✅ `/sys/class/dmi/id`
     * bios_date
