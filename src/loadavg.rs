@@ -45,7 +45,7 @@ pub fn collect() -> LoadAvg {
                 .collect();
 
             if avgfields.len() < 3 {
-                log::error!("invalid load avegrage field number {}", avgfields.len());
+                log::error!("invalid load avegrage fields number {}", avgfields.len());
 
                 return sysload;
             }
