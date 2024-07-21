@@ -39,7 +39,11 @@ pub fn collect() -> Vec<BuddyInfo> {
         let fields: Vec<&str> = line.trim().split(' ').filter(|s| !s.is_empty()).collect();
 
         if fields.len() < 4 {
-            log::error!("invalid buddyinfo fields number, found {}", fields.len());
+            log::error!(
+                "invalid buddyinfo fields number, found {}: {:?}",
+                fields.len(),
+                fields,
+            );
             continue;
         }
 

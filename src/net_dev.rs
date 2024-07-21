@@ -73,7 +73,11 @@ pub fn collect() -> Vec<NetDev> {
         let fields: Vec<&str> = line.trim().split(' ').filter(|s| !s.is_empty()).collect();
 
         if fields.len() != 17 {
-            log::error!("invalid network fields number {}", fields.len());
+            log::error!(
+                "invalid network fields number {}: {:?}",
+                fields.len(),
+                fields,
+            );
             continue;
         }
 
