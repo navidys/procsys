@@ -271,7 +271,11 @@ pub fn collect() -> Meminfo {
         let item_fields: Vec<&str> = line.trim().split(':').filter(|s| !s.is_empty()).collect();
 
         if item_fields.len() != 2 {
-            log::error!("invalid meminfo item fields number {}", item_fields.len());
+            log::error!(
+                "invalid meminfo item fields number {}: {:?}",
+                item_fields.len(),
+                item_fields,
+            );
             continue;
         }
 
