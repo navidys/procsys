@@ -5,7 +5,7 @@ use serde::Serialize;
 use crate::utils;
 
 /// LoadAvg represents an entry in /proc/loadavg
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Serialize, Clone, Default)]
 pub struct LoadAvg {
     pub load1: f64,
     pub load5: f64,
@@ -14,11 +14,7 @@ pub struct LoadAvg {
 
 impl LoadAvg {
     fn new() -> Self {
-        Self {
-            load1: 0.0,
-            load5: 0.0,
-            load15: 0.0,
-        }
+        Default::default()
     }
 }
 

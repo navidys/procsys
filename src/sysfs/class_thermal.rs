@@ -28,7 +28,7 @@ impl ThermalZoneInfo {
 }
 
 /// ThermalZone contains info from files in /sys/class/thermal/thermal_zoneX.
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Serialize, Clone, Default)]
 pub struct ThermalZone {
     pub name: String,
     pub zone_type: String,
@@ -39,15 +39,8 @@ pub struct ThermalZone {
 }
 
 impl ThermalZone {
-    fn new(name: &str) -> Self {
-        Self {
-            name: name.to_string(),
-            zone_type: String::new(),
-            policy: String::new(),
-            temp: i64::from(0),
-            mode: None,
-            passive: None,
-        }
+    fn new() -> Self {
+        Default::default()
     }
 }
 
@@ -75,7 +68,9 @@ pub fn collect() -> Vec<ThermalZone> {
     let thermal_zone_class_path = Path::new("/sys/class/thermal/");
 
     for tdevice in utils::list_dir_content(thermal_zone_class_path, "thermal_zone", "thermal") {
-        let mut thermal_device = ThermalZone::new(&tdevice);
+        let mut thermal_device = ThermalZone::new();
+        thermal_device.name = tdevice.to_string();
+
         let mut tdev_path = PathBuf::from(thermal_zone_class_path);
 
         tdev_path.push(&tdevice);

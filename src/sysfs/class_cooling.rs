@@ -24,7 +24,7 @@ impl CoolingInfo {
 }
 
 /// Cooling contains a cooling device information from files in /sys/class/thermal/cooling_device[0-9]*
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Serialize, Clone, Default)]
 pub struct Cooling {
     pub name: String,
     pub cooling_type: String,
@@ -33,13 +33,8 @@ pub struct Cooling {
 }
 
 impl Cooling {
-    fn new(name: &str) -> Self {
-        Self {
-            name: name.to_string(),
-            cooling_type: String::new(),
-            max_state: i64::from(0),
-            cur_state: i64::from(0),
-        }
+    fn new() -> Self {
+        Default::default()
     }
 }
 
@@ -58,7 +53,9 @@ pub fn collect() -> Vec<Cooling> {
     let cooling_class_path = Path::new("/sys/class/thermal/");
 
     for cdevice in utils::list_dir_content(cooling_class_path, "cooling_device", "thermal") {
-        let mut cooling_device = Cooling::new(&cdevice);
+        let mut cooling_device = Cooling::new();
+        cooling_device.name = cdevice.to_string();
+
         let mut cdev_path = PathBuf::from(cooling_class_path);
 
         cdev_path.push(&cdevice);

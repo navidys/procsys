@@ -3,7 +3,7 @@ use serde::Serialize;
 use crate::utils;
 
 /// NetDev contains a network device information parsed from /proc/net/dev
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Serialize, Clone, Default)]
 pub struct NetDev {
     pub name: String,
     pub rx_bytes: u64,
@@ -25,26 +25,8 @@ pub struct NetDev {
 }
 
 impl NetDev {
-    fn new(name: String) -> Self {
-        NetDev {
-            name,
-            rx_bytes: 0,
-            rx_packets: 0,
-            rx_errors: 0,
-            rx_dropped: 0,
-            rx_fifo: 0,
-            rx_frame: 0,
-            rx_compressed: 0,
-            rx_multicast: 0,
-            tx_bytes: 0,
-            tx_packets: 0,
-            tx_errors: 0,
-            tx_dropped: 0,
-            tx_fifo: 0,
-            tx_collisions: 0,
-            tx_carrier: 0,
-            tx_compressed: 0,
-        }
+    fn new() -> Self {
+        Default::default()
     }
 }
 
@@ -81,7 +63,8 @@ pub fn collect() -> Vec<NetDev> {
             continue;
         }
 
-        let mut net_device = NetDev::new(fields[0].trim_matches(':').to_string());
+        let mut net_device = NetDev::new();
+        net_device.name = fields[0].trim_matches(':').to_string();
         net_device.rx_bytes = fields[1].parse::<u64>().unwrap_or_default();
         net_device.rx_packets = fields[2].parse::<u64>().unwrap_or_default();
         net_device.rx_errors = fields[3].parse::<u64>().unwrap_or_default();
