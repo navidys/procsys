@@ -29,11 +29,11 @@ impl KernelRandomInfo {
 /// KernelRandom contains information about to the kernel's random number generator
 #[derive(Debug, Serialize, Clone)]
 pub struct KernelRandom {
-    entropy_available: Option<u64>,
-    pool_size: Option<u64>,
-    urandom_min_reseed_secs: Option<u64>,
-    write_wakeup_threshold: Option<u64>,
-    read_wakeup_threshold: Option<u64>,
+    pub entropy_available: Option<u64>,
+    pub pool_size: Option<u64>,
+    pub urandom_min_reseed_secs: Option<u64>,
+    pub write_wakeup_threshold: Option<u64>,
+    pub read_wakeup_threshold: Option<u64>,
 }
 
 impl KernelRandom {

@@ -7,9 +7,9 @@ use crate::utils;
 /// The sizes are 2^n*PAGE_SIZE, where n is the array index
 #[derive(Debug, Serialize, Clone)]
 pub struct BuddyInfo {
-    node: String,
-    zone: String,
-    sizes: Vec<u64>,
+    pub node: String,
+    pub zone: String,
+    pub sizes: Vec<u64>,
 }
 
 impl BuddyInfo {
