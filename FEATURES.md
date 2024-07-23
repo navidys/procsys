@@ -9,6 +9,8 @@ Supported Features
 
 * ✅ `/proc/net/dev`
 
+* ✅ `/proc/net/protocols`
+
 * ✅ `/proc/sys/kernel/random`
     * entropy_avail
     * poolsize
