@@ -129,7 +129,7 @@ impl MeminfoType {
 }
 
 /// Meminfo represents memory statistics (bytes) retrieve from /proc/meminfo
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Serialize, Clone, Default)]
 pub struct Meminfo {
     pub mem_total: Option<u64>,
     pub mem_free: Option<u64>,
@@ -192,65 +192,7 @@ pub struct Meminfo {
 
 impl Meminfo {
     fn new() -> Self {
-        Self {
-            mem_total: None,
-            mem_free: None,
-            mem_available: None,
-            buffers: None,
-            cached: None,
-            swap_cached: None,
-            active: None,
-            inactive: None,
-            active_anon: None,
-            inactive_anon: None,
-            active_file: None,
-            inactive_file: None,
-            unevictable: None,
-            mlocked: None,
-            swap_total: None,
-            swap_free: None,
-            z_swap: None,
-            z_swapped: None,
-            dirty: None,
-            writeback: None,
-            annon_pages: None,
-            mapped: None,
-            shmem: None,
-            k_reclaimable: None,
-            slap: None,
-            s_reclaimable: None,
-            s_unreclaim: None,
-            kernel_stack: None,
-            page_tables: None,
-            sec_page_tables: None,
-            nfs_unstable: None,
-            bounce: None,
-            writeback_tmp: None,
-            commit_limit: None,
-            committed_as: None,
-            vmalloc_total: None,
-            vmalloc_used: None,
-            vmalloc_chunk: None,
-            per_cpu: None,
-            hardware_corrupted: None,
-            annon_huge_pages: None,
-            shmem_huge_pages: None,
-            shmem_pmd_mapped: None,
-            file_huge_pages: None,
-            file_pmd_mapped: None,
-            cma_total: None,
-            cma_free: None,
-            unaccepted: None,
-            huge_pages_total: None,
-            huge_pages_free: None,
-            huge_pages_rsvd: None,
-            huge_pages_surp: None,
-            huge_page_size: None,
-            huge_tlb: None,
-            direct_map_4k: None,
-            direct_map_2m: None,
-            direct_map_1g: None,
-        }
+        Default::default()
     }
 }
 

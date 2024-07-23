@@ -27,7 +27,7 @@ impl KernelRandomInfo {
 }
 
 /// KernelRandom contains information about to the kernel's random number generator
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Serialize, Clone, Default)]
 pub struct KernelRandom {
     pub entropy_available: Option<u64>,
     pub pool_size: Option<u64>,
@@ -38,13 +38,7 @@ pub struct KernelRandom {
 
 impl KernelRandom {
     fn new() -> Self {
-        Self {
-            entropy_available: None,
-            pool_size: None,
-            urandom_min_reseed_secs: None,
-            write_wakeup_threshold: None,
-            read_wakeup_threshold: None,
-        }
+        Default::default()
     }
 }
 

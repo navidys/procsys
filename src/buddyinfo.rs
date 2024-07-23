@@ -5,7 +5,7 @@ use crate::utils;
 /// BuddyInfo is the details parsed from /proc/buddyinfo
 /// The data is comprised of an array of free fragments of each size
 /// The sizes are 2^n*PAGE_SIZE, where n is the array index
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Serialize, Clone, Default)]
 pub struct BuddyInfo {
     pub node: String,
     pub zone: String,
@@ -14,11 +14,7 @@ pub struct BuddyInfo {
 
 impl BuddyInfo {
     fn new() -> Self {
-        Self {
-            node: String::new(),
-            zone: String::new(),
-            sizes: Vec::<u64>::new(),
-        }
+        Default::default()
     }
 }
 

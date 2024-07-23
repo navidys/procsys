@@ -55,7 +55,7 @@ impl DMIType {
 }
 
 /// The DMI contains the content of Desktop Management Interface from files in in /sys/class/dmi/id
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Serialize, Clone, Default)]
 pub struct DMI {
     pub bios_date: Option<String>,
     pub bios_release: Option<String>,
@@ -82,29 +82,7 @@ pub struct DMI {
 
 impl DMI {
     fn new() -> Self {
-        Self {
-            bios_date: None,
-            bios_release: None,
-            bios_vendor: None,
-            bios_version: None,
-            board_asset_tag: None,
-            board_name: None,
-            board_serial: None,
-            board_vendor: None,
-            board_version: None,
-            chassis_asset_tag: None,
-            chassis_serial: None,
-            chassis_type: None,
-            chassis_vendor: None,
-            chassis_version: None,
-            product_family: None,
-            product_name: None,
-            product_serial: None,
-            product_sku: None,
-            product_uuid: None,
-            product_version: None,
-            system_vendor: None,
-        }
+        Default::default()
     }
 }
 

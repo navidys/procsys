@@ -46,7 +46,7 @@ impl WatchdogInfo {
 }
 
 /// Watchdog contains a watchdog device stat information from files in /sys/class/watchdog
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Serialize, Clone, Default)]
 pub struct Watchdog {
     pub name: String,
     pub boot_status: Option<i64>,
@@ -66,24 +66,8 @@ pub struct Watchdog {
 }
 
 impl Watchdog {
-    fn new(name: String) -> Self {
-        Self {
-            name,
-            boot_status: None,
-            options: None,
-            fw_version: None,
-            identity: None,
-            nowayout: None,
-            state: None,
-            status: None,
-            timeleft: None,
-            timeout: None,
-            min_timeout: None,
-            max_timeout: None,
-            pretimeout: None,
-            pretimeout_governor: None,
-            access_cs0: None,
-        }
+    fn new() -> Self {
+        Default::default()
     }
 }
 
@@ -110,7 +94,8 @@ pub fn collect() -> Vec<Watchdog> {
     let mut devices = Vec::new();
     let watchdog_class_path = Path::new("/sys/class/watchdog/");
     for device in utils::list_dir_content(watchdog_class_path, "", "watchdog") {
-        let mut watchdog_dev = Watchdog::new(device.to_owned());
+        let mut watchdog_dev = Watchdog::new();
+        watchdog_dev.name = device.to_string();
 
         let mut wdev_path = PathBuf::from(watchdog_class_path);
         wdev_path.push(&device);

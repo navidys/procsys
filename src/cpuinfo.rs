@@ -69,68 +69,40 @@ impl CpuInfoInfo {
 }
 
 /// CpuInfo contains general information about a system CPU found in /proc/cpuinfo
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Serialize, Clone, Default)]
 pub struct CpuInfo {
     pub processor: u32,
-    pub vendor_id: Option<String>,
-    pub cpu_family: Option<u32>,
-    pub model: Option<u32>,
-    pub model_name: Option<String>,
-    pub stepping: Option<u32>,
-    pub microcode: Option<String>,
-    pub cpu_mhz: Option<f64>,
-    pub cache_size_bytes: Option<u64>,
-    pub physical_id: Option<u32>,
-    pub siblings: Option<u32>,
-    pub core_id: Option<u32>,
-    pub cpu_cores: Option<u32>,
-    pub apic_id: Option<u32>,
-    pub initial_apic_id: Option<u32>,
-    pub fpu: Option<String>,
-    pub fpu_exception: Option<String>,
-    pub cpu_id_level: Option<u32>,
-    pub wp: Option<String>,
+    pub vendor_id: String,
+    pub cpu_family: u32,
+    pub model: u32,
+    pub model_name: String,
+    pub stepping: u32,
+    pub microcode: String,
+    pub cpu_mhz: f64,
+    pub cache_size_bytes: u64,
+    pub physical_id: u32,
+    pub siblings: u32,
+    pub core_id: u32,
+    pub cpu_cores: u32,
+    pub apic_id: u32,
+    pub initial_apic_id: u32,
+    pub fpu: String,
+    pub fpu_exception: String,
+    pub cpu_id_level: u32,
+    pub wp: String,
     pub flags: Vec<String>,
     pub vmx_flags: Vec<String>,
     pub bugs: Vec<String>,
-    pub bogomips: Option<f64>,
-    pub clflush_size: Option<u32>,
-    pub cache_alignment: Option<u32>,
-    pub address_sizes: Option<String>,
-    pub power_management: Option<String>,
+    pub bogomips: f64,
+    pub clflush_size: u32,
+    pub cache_alignment: u32,
+    pub address_sizes: String,
+    pub power_management: String,
 }
 
 impl CpuInfo {
-    fn new(processor: u32) -> Self {
-        Self {
-            processor,
-            vendor_id: None,
-            cpu_family: None,
-            model: None,
-            model_name: None,
-            stepping: None,
-            microcode: None,
-            cpu_mhz: None,
-            cache_size_bytes: None,
-            physical_id: None,
-            siblings: None,
-            core_id: None,
-            cpu_cores: None,
-            apic_id: None,
-            initial_apic_id: None,
-            fpu: None,
-            fpu_exception: None,
-            cpu_id_level: None,
-            wp: None,
-            flags: Vec::new(),
-            vmx_flags: Vec::new(),
-            bugs: Vec::new(),
-            bogomips: None,
-            clflush_size: None,
-            cache_alignment: None,
-            address_sizes: None,
-            power_management: None,
-        }
+    fn new() -> Self {
+        Default::default()
     }
 }
 
@@ -146,6 +118,8 @@ impl CpuInfo {
 /// ```
 pub fn collect() -> Vec<CpuInfo> {
     let mut sys_cpuinfo: Vec<CpuInfo> = Vec::new();
+    let default_u32 = Default::default();
+    let default_f64 = Default::default();
 
     let mut info_index = 0;
     for line in utils::read_file_lines("/proc/cpuinfo") {
@@ -176,48 +150,57 @@ pub fn collect() -> Vec<CpuInfo> {
                     .unwrap_or_default()
                     .parse::<u32>()
                     .unwrap_or_default();
-                sys_cpuinfo.push(CpuInfo::new(processor));
+
+                let mut cpuinfo = CpuInfo::new();
+                cpuinfo.processor = processor;
+                sys_cpuinfo.push(cpuinfo);
             }
-            CpuInfoInfo::VendorID => sys_cpuinfo[info_index].vendor_id = metric_value,
+            CpuInfoInfo::VendorID => {
+                sys_cpuinfo[info_index].vendor_id = metric_value.unwrap_or_default()
+            }
             CpuInfoInfo::CpuFamily => {
                 sys_cpuinfo[info_index].cpu_family =
                     match metric_value.unwrap_or_default().parse::<u32>() {
-                        Ok(c) => Some(c),
+                        Ok(c) => c,
                         Err(err) => {
                             log::error!("failed to parse cpu family: {:?}", err);
-                            None
+                            default_u32
                         }
                     };
             }
             CpuInfoInfo::Model => {
                 sys_cpuinfo[info_index].model =
                     match metric_value.unwrap_or_default().parse::<u32>() {
-                        Ok(c) => Some(c),
+                        Ok(c) => c,
                         Err(err) => {
                             log::error!("failed to parse cpu model: {:?}", err);
-                            None
+                            default_u32
                         }
                     };
             }
-            CpuInfoInfo::ModelName => sys_cpuinfo[info_index].model_name = metric_value,
+            CpuInfoInfo::ModelName => {
+                sys_cpuinfo[info_index].model_name = metric_value.unwrap_or_default()
+            }
             CpuInfoInfo::Stepping => {
                 sys_cpuinfo[info_index].stepping =
                     match metric_value.unwrap_or_default().parse::<u32>() {
-                        Ok(c) => Some(c),
+                        Ok(c) => c,
                         Err(err) => {
                             log::error!("failed to parse cpu stepping: {:?}", err);
-                            None
+                            default_u32
                         }
                     };
             }
-            CpuInfoInfo::Microcode => sys_cpuinfo[info_index].microcode = metric_value,
+            CpuInfoInfo::Microcode => {
+                sys_cpuinfo[info_index].microcode = metric_value.unwrap_or_default()
+            }
             CpuInfoInfo::CpuMhz => {
                 sys_cpuinfo[info_index].cpu_mhz =
                     match metric_value.unwrap_or_default().parse::<f64>() {
-                        Ok(c) => Some(c),
+                        Ok(c) => c,
                         Err(err) => {
                             log::error!("failed to parse cpu mhz: {:?}", err);
-                            None
+                            default_f64
                         }
                     };
             }
@@ -233,81 +216,83 @@ pub fn collect() -> Vec<CpuInfo> {
                 }
 
                 sys_cpuinfo[info_index].cache_size_bytes =
-                    utils::convert_to_bytes(item_value, item_unit);
+                    utils::convert_to_bytes(item_value, item_unit).unwrap_or_default();
             }
             CpuInfoInfo::PhysicalID => {
                 sys_cpuinfo[info_index].physical_id =
                     match metric_value.unwrap_or_default().parse::<u32>() {
-                        Ok(c) => Some(c),
+                        Ok(c) => c,
                         Err(err) => {
                             log::error!("failed to parse cpu physical id: {:?}", err);
-                            None
+                            default_u32
                         }
                     };
             }
             CpuInfoInfo::Siblings => {
                 sys_cpuinfo[info_index].siblings =
                     match metric_value.unwrap_or_default().parse::<u32>() {
-                        Ok(c) => Some(c),
+                        Ok(c) => c,
                         Err(err) => {
                             log::error!("failed to parse cpu siblings: {:?}", err);
-                            None
+                            default_u32
                         }
                     };
             }
             CpuInfoInfo::CoreID => {
                 sys_cpuinfo[info_index].core_id =
                     match metric_value.unwrap_or_default().parse::<u32>() {
-                        Ok(c) => Some(c),
+                        Ok(c) => c,
                         Err(err) => {
                             log::error!("failed to parse cpu core id: {:?}", err);
-                            None
+                            default_u32
                         }
                     };
             }
             CpuInfoInfo::CpuCores => {
                 sys_cpuinfo[info_index].cpu_cores =
                     match metric_value.unwrap_or_default().parse::<u32>() {
-                        Ok(c) => Some(c),
+                        Ok(c) => c,
                         Err(err) => {
                             log::error!("failed to parse cpu cores: {:?}", err);
-                            None
+                            default_u32
                         }
                     };
             }
             CpuInfoInfo::ApicID => {
                 sys_cpuinfo[info_index].apic_id =
                     match metric_value.unwrap_or_default().parse::<u32>() {
-                        Ok(c) => Some(c),
+                        Ok(c) => c,
                         Err(err) => {
                             log::error!("failed to parse cpu apic id: {:?}", err);
-                            None
+                            default_u32
                         }
                     };
             }
             CpuInfoInfo::InitialApicID => {
                 sys_cpuinfo[info_index].initial_apic_id =
                     match metric_value.unwrap_or_default().parse::<u32>() {
-                        Ok(c) => Some(c),
+                        Ok(c) => c,
                         Err(err) => {
                             log::error!("failed to parse cpu initial apic id: {:?}", err);
-                            None
+                            default_u32
                         }
                     };
             }
-            CpuInfoInfo::Fpu => sys_cpuinfo[info_index].fpu = metric_value,
-            CpuInfoInfo::FpuException => sys_cpuinfo[info_index].fpu_exception = metric_value,
+            CpuInfoInfo::Fpu => sys_cpuinfo[info_index].fpu = metric_value.unwrap_or_default(),
+            CpuInfoInfo::FpuException => {
+                sys_cpuinfo[info_index].fpu_exception = metric_value.unwrap_or_default();
+            }
             CpuInfoInfo::CpuIDLevel => {
                 sys_cpuinfo[info_index].cpu_id_level =
                     match metric_value.unwrap_or_default().parse::<u32>() {
-                        Ok(c) => Some(c),
+                        Ok(c) => c,
                         Err(err) => {
                             log::error!("failed to parse cpu id level: {:?}", err);
-                            None
+                            default_u32
                         }
                     };
             }
-            CpuInfoInfo::Wp => sys_cpuinfo[info_index].wp = metric_value,
+            CpuInfoInfo::Wp => sys_cpuinfo[info_index].wp = metric_value.unwrap_or_default(),
             CpuInfoInfo::Flags => {
                 for flag in metric_value.unwrap_or_default().trim().split(' ') {
                     sys_cpuinfo[info_index].flags.push(flag.to_string());
@@ -326,36 +311,38 @@ pub fn collect() -> Vec<CpuInfo> {
             CpuInfoInfo::BogoMips => {
                 sys_cpuinfo[info_index].bogomips =
                     match metric_value.unwrap_or_default().parse::<f64>() {
-                        Ok(c) => Some(c),
+                        Ok(c) => c,
                         Err(err) => {
                             log::error!("failed to parse cpu bogomips: {:?}", err);
-                            None
+                            default_f64
                         }
                     };
             }
             CpuInfoInfo::ClflushSize => {
                 sys_cpuinfo[info_index].clflush_size =
                     match metric_value.unwrap_or_default().parse::<u32>() {
-                        Ok(c) => Some(c),
+                        Ok(c) => c,
                         Err(err) => {
                             log::error!("failed to parse cpu clflush size: {:?}", err);
-                            None
+                            default_u32
                         }
                     };
             }
             CpuInfoInfo::CacheAlignment => {
                 sys_cpuinfo[info_index].cache_alignment =
                     match metric_value.unwrap_or_default().parse::<u32>() {
-                        Ok(c) => Some(c),
+                        Ok(c) => c,
                         Err(err) => {
                             log::error!("failed to parse cpu cache alignment: {:?}", err);
-                            None
+                            default_u32
                         }
                     };
             }
-            CpuInfoInfo::AddressSize => sys_cpuinfo[info_index].address_sizes = metric_value,
+            CpuInfoInfo::AddressSize => {
+                sys_cpuinfo[info_index].address_sizes = metric_value.unwrap_or_default();
+            }
             CpuInfoInfo::PowerManagement => {
-                sys_cpuinfo[info_index].power_management = metric_value;
+                sys_cpuinfo[info_index].power_management = metric_value.unwrap_or_default();
             }
             CpuInfoInfo::Unknown => {}
         }
