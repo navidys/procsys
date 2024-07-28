@@ -1,6 +1,9 @@
 use serde::Serialize;
 
-use crate::utils;
+use crate::{
+    error::{CollectResult, MetricError},
+    utils,
+};
 
 /// BuddyInfo is the details parsed from /proc/buddyinfo
 /// The data is comprised of an array of free fragments of each size
@@ -23,24 +26,23 @@ impl BuddyInfo {
 /// ```
 /// use procsys::buddyinfo;
 ///
-/// let binfo = buddyinfo::collect();
+/// let binfo = buddyinfo::collect().expect("buddy information");
 /// let json_output = serde_json::to_string_pretty(&binfo).unwrap();
 /// println!("{}", json_output);
 ///
 /// ```
-pub fn collect() -> Vec<BuddyInfo> {
+pub fn collect() -> CollectResult<Vec<BuddyInfo>> {
     let mut system_buddyinfo = Vec::new();
 
-    for line in utils::read_file_lines("/proc/buddyinfo") {
+    for line in utils::read_file_lines("/proc/buddyinfo")? {
         let fields: Vec<&str> = line.trim().split(' ').filter(|s| !s.is_empty()).collect();
 
         if fields.len() < 4 {
-            log::error!(
-                "invalid buddyinfo fields number, found {}: {:?}",
+            return Err(MetricError::InvalidFieldNumberError(
+                "buddyinfo".to_string(),
                 fields.len(),
-                fields,
-            );
-            continue;
+                line,
+            ));
         }
 
         let mut buddyinfo = BuddyInfo::new();
@@ -57,7 +59,7 @@ pub fn collect() -> Vec<BuddyInfo> {
         system_buddyinfo.push(buddyinfo);
     }
 
-    system_buddyinfo
+    Ok(system_buddyinfo)
 }
 
 #[cfg(test)]
@@ -66,7 +68,7 @@ mod tests {
 
     #[test]
     fn buddyinfo() {
-        let binfolist = collect();
+        let binfolist = collect().expect("collecting buddy information");
         for binfo in binfolist {
             assert!(!binfo.node.is_empty());
             assert!(!binfo.zone.is_empty());

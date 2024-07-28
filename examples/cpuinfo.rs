@@ -1,9 +1,7 @@
 use procsys::cpuinfo;
 
 fn main() {
-    env_logger::init();
-
-    let sys_cpuinfo = cpuinfo::collect();
+    let sys_cpuinfo = cpuinfo::collect().expect("cpu information");
 
     match serde_json::to_string_pretty(&sys_cpuinfo) {
         Ok(output) => println!("{}", output),

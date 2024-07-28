@@ -1,4 +1,10 @@
-use std::{fmt, path::PathBuf};
+use std::{
+    fmt,
+    num::{ParseFloatError, ParseIntError},
+    path::PathBuf,
+};
+
+pub type CollectResult<T> = std::result::Result<T, MetricError>;
 
 /// An error received from sysmetrics
 #[derive(Debug)]
@@ -11,6 +17,18 @@ pub enum MetricError {
 
     /// json serde pretty error
     SerdeJsonError(serde_json::Error),
+
+    /// parse int error
+    ParseIntError(String, ParseIntError),
+
+    /// parse int error
+    ParseFloatError(String, ParseFloatError),
+
+    /// Byte convert error
+    ByteConvertError(String),
+
+    /// Invalid fields number
+    InvalidFieldNumberError(String, usize, String),
 }
 
 impl fmt::Display for MetricError {
@@ -24,6 +42,16 @@ impl fmt::Display for MetricError {
                 write!(f, "cannot read sysfs {:?}: {}", p, e)
             }
             MetricError::SerdeJsonError(ref e) => write!(f, "json pretty error: {}", e),
+            MetricError::ParseIntError(ref item, ref e) => {
+                write!(f, "{} parse {} int error", item, e)
+            }
+            MetricError::ParseFloatError(ref item, ref e) => {
+                write!(f, "{} parse {} float error", item, e)
+            }
+            MetricError::ByteConvertError(ref unit) => write!(f, "invalid unit: {}", unit),
+            MetricError::InvalidFieldNumberError(ref title, ref num, ref fields) => {
+                write!(f, "invalid {} fields number {}: {:?}", title, num, fields)
+            }
         }
     }
 }

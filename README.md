@@ -12,7 +12,7 @@ There are several examples in the documents and also in the [examples](https://g
 ```
 use procsys::sysfs::class_watchdog;
 
-let watchdog_devices = class_watchdog::collect();
+let watchdog_devices = class_watchdog::collect().expect("watchdog information");
 
 for wdev in &watchdog_devices {
     println!("name: {}", wdev.name);

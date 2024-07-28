@@ -1,9 +1,7 @@
 use procsys::kernel_random;
 
 fn main() {
-    env_logger::init();
-
-    let krandom = kernel_random::collect();
+    let krandom = kernel_random::collect().expect("random generator information");
 
     match serde_json::to_string_pretty(&krandom) {
         Ok(output) => println!("{}", output),

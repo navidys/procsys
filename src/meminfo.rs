@@ -1,6 +1,9 @@
 use serde::Serialize;
 
-use crate::utils;
+use crate::{
+    error::{CollectResult, MetricError},
+    utils,
+};
 
 enum MeminfoType {
     MemTotal,
@@ -201,24 +204,23 @@ impl Meminfo {
 /// ```
 /// use procsys::meminfo;
 ///
-/// let sys_meminfo = meminfo::collect();
+/// let sys_meminfo = meminfo::collect().expect("memory information");
 /// let json_output = serde_json::to_string_pretty(&sys_meminfo).unwrap();
 /// println!("{}", json_output);
 ///
 /// ```
-pub fn collect() -> Meminfo {
+pub fn collect() -> CollectResult<Meminfo> {
     let mut meminfo = Meminfo::new();
 
-    for line in utils::read_file_lines("/proc/meminfo") {
+    for line in utils::read_file_lines("/proc/meminfo")? {
         let item_fields: Vec<&str> = line.trim().split(':').filter(|s| !s.is_empty()).collect();
 
         if item_fields.len() != 2 {
-            log::error!(
-                "invalid meminfo item fields number {}: {:?}",
+            return Err(MetricError::InvalidFieldNumberError(
+                "meminfo".to_string(),
                 item_fields.len(),
-                item_fields,
-            );
-            continue;
+                line,
+            ));
         }
 
         let value_fields: Vec<&str> = item_fields[1]
@@ -233,7 +235,7 @@ pub fn collect() -> Meminfo {
             item_unit = value_fields[1];
         }
 
-        let metric_value = utils::convert_to_bytes(item_value, item_unit);
+        let metric_value = utils::convert_to_bytes(item_value, item_unit)?;
 
         match MeminfoType::from(item_fields[0]) {
             MeminfoType::MemTotal => meminfo.mem_total = metric_value,
@@ -297,7 +299,7 @@ pub fn collect() -> Meminfo {
         }
     }
 
-    meminfo
+    Ok(meminfo)
 }
 
 #[cfg(test)]
@@ -307,7 +309,7 @@ mod tests {
     #[test]
     fn mem_stats() {
         let min_value: u64 = 0;
-        let meminfo = collect();
+        let meminfo = collect().expect("collecting memory information");
 
         assert!(meminfo.mem_total.unwrap_or_default().ge(&min_value));
         assert!(meminfo.mem_free.unwrap_or_default().ge(&min_value));

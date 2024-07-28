@@ -6,47 +6,45 @@ use std::{
 
 use walkdir::WalkDir;
 
-use crate::error::MetricError;
+use crate::error::{CollectResult, MetricError};
 
-pub fn collect_info_string(filename: &str, dir_path: &Path) -> Option<String> {
+pub fn collect_info_string(filename: &str, dir_path: &Path) -> CollectResult<Option<String>> {
     if filename.is_empty() {
-        return None;
+        return Ok(None);
     }
 
     let info_path = Path::new(dir_path).join(filename);
 
     match fs::read_to_string(info_path.as_path()) {
-        Ok(c) => return Some(c.trim().to_string()),
-        Err(err) => log::error!("{}", MetricError::IOError(info_path, err)),
+        Ok(c) => Ok(Some(c.trim().to_string())),
+        Err(err) => Err(MetricError::IOError(info_path, err)),
     }
-
-    None
 }
 
-pub fn collect_info_i64(filename: &str, dir_path: &Path) -> Option<i64> {
-    if let Some(c) = collect_info_string(filename, dir_path) {
+pub fn collect_info_i64(filename: &str, dir_path: &Path) -> CollectResult<Option<i64>> {
+    if let Some(c) = collect_info_string(filename, dir_path)? {
         if !c.is_empty() {
             match c.parse::<i64>() {
-                Ok(i) => return Some(i),
-                Err(err) => log::error!("{}", err),
+                Ok(i) => return Ok(Some(i)),
+                Err(err) => return Err(MetricError::ParseIntError(filename.to_string(), err)),
             }
         }
     }
 
-    None
+    Ok(None)
 }
 
-pub fn collect_info_u64(filename: &str, dir_path: &Path) -> Option<u64> {
-    if let Some(c) = collect_info_string(filename, dir_path) {
+pub fn collect_info_u64(filename: &str, dir_path: &Path) -> CollectResult<Option<u64>> {
+    if let Some(c) = collect_info_string(filename, dir_path)? {
         if !c.is_empty() {
             match c.parse::<u64>() {
-                Ok(i) => return Some(i),
-                Err(err) => log::error!("{}", err),
+                Ok(i) => return Ok(Some(i)),
+                Err(err) => return Err(MetricError::ParseIntError(filename.to_string(), err)),
             }
         }
     }
 
-    None
+    Ok(None)
 }
 
 pub fn list_dir_content(
@@ -77,7 +75,7 @@ pub fn list_dir_content(
     content
 }
 
-pub fn read_file_lines(filename: &str) -> Vec<String> {
+pub fn read_file_lines(filename: &str) -> CollectResult<Vec<String>> {
     let mut result = Vec::new();
 
     match File::open(filename) {
@@ -86,25 +84,22 @@ pub fn read_file_lines(filename: &str) -> Vec<String> {
             for line_result in reader.lines() {
                 match line_result {
                     Ok(line) => result.push(line),
-                    Err(err) => log::error!("{}", err),
+                    Err(err) => return Err(MetricError::IOError(PathBuf::from(filename), err)),
                 }
             }
         }
-        Err(err) => log::error!("{}", MetricError::IOError(PathBuf::from(filename), err)),
+        Err(err) => return Err(MetricError::IOError(PathBuf::from(filename), err)),
     }
 
-    result
+    Ok(result)
 }
 
-pub fn convert_to_bytes(num: u64, unit: &str) -> Option<u64> {
+pub fn convert_to_bytes(num: u64, unit: &str) -> CollectResult<Option<u64>> {
     match unit {
-        "B" => Some(num),
-        "KiB" | "kiB" | "kB" | "KB" => Some(num * 1024),
-        "MiB" | "miB" | "MB" | "mB" => Some(num * 1024 * 1024),
-        "GiB" | "giB" | "GB" | "gB" => Some(num * 1024 * 1024 * 1024),
-        _ => {
-            log::error!("invalid unit: {}", unit);
-            None
-        }
+        "B" => Ok(Some(num)),
+        "KiB" | "kiB" | "kB" | "KB" => Ok(Some(num * 1024)),
+        "MiB" | "miB" | "MB" | "mB" => Ok(Some(num * 1024 * 1024)),
+        "GiB" | "giB" | "GB" | "gB" => Ok(Some(num * 1024 * 1024 * 1024)),
+        _ => Err(MetricError::ByteConvertError(unit.to_string())),
     }
 }
