@@ -18,7 +18,7 @@ validate: $(CARGO_TARGET_DIR) ## Validate code
 
 .PHONY: test
 test: $(CARGO_TARGET_DIR) ## Run unit tests
-	$(CARGO) test
+	sudo $(CARGO) test
 
 .PHONY: pre-commit
 pre-commit:   ## Run pre-commit
@@ -50,7 +50,7 @@ crate-publish: ## Publish crate
 
 .PHONY: clean
 clean: ## Cleanup
-	rm -rf target
+	sudo rm -rf target
 
 #=================================================
 # Required tools installation tartgets

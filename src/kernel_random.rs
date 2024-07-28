@@ -2,7 +2,7 @@ use std::path::Path;
 
 use serde::Serialize;
 
-use crate::utils;
+use crate::{error::CollectResult, utils};
 
 enum KernelRandomInfo {
     EntropyAvaliable,
@@ -48,38 +48,38 @@ impl KernelRandom {
 /// ```
 /// use procsys::kernel_random;
 ///
-/// let krandom = kernel_random::collect();
+/// let krandom = kernel_random::collect().expect("kernel random generator");
 ///
 /// let json_output = serde_json::to_string_pretty(&krandom).unwrap();
 /// println!("{}", json_output);
 ///
 /// ```
-pub fn collect() -> KernelRandom {
+pub fn collect() -> CollectResult<KernelRandom> {
     let mut krandom = KernelRandom::new();
     let krandom_dir = Path::new("/proc/sys/kernel/random");
 
     for item in utils::list_dir_content(krandom_dir, "", "random") {
         match KernelRandomInfo::from(&item) {
             KernelRandomInfo::EntropyAvaliable => {
-                krandom.entropy_available = utils::collect_info_u64(&item, krandom_dir)
+                krandom.entropy_available = utils::collect_info_u64(&item, krandom_dir)?
             }
             KernelRandomInfo::PoolSize => {
-                krandom.pool_size = utils::collect_info_u64(&item, krandom_dir)
+                krandom.pool_size = utils::collect_info_u64(&item, krandom_dir)?
             }
             KernelRandomInfo::URandomMinReseedSeconds => {
-                krandom.urandom_min_reseed_secs = utils::collect_info_u64(&item, krandom_dir)
+                krandom.urandom_min_reseed_secs = utils::collect_info_u64(&item, krandom_dir)?
             }
             KernelRandomInfo::WriteWakeupThreshold => {
-                krandom.write_wakeup_threshold = utils::collect_info_u64(&item, krandom_dir)
+                krandom.write_wakeup_threshold = utils::collect_info_u64(&item, krandom_dir)?
             }
             KernelRandomInfo::ReadWakeupThreshold => {
-                krandom.read_wakeup_threshold = utils::collect_info_u64(&item, krandom_dir)
+                krandom.read_wakeup_threshold = utils::collect_info_u64(&item, krandom_dir)?
             }
             KernelRandomInfo::Unknown => {}
         }
     }
 
-    krandom
+    Ok(krandom)
 }
 
 #[cfg(test)]
@@ -89,7 +89,7 @@ mod tests {
     #[test]
     fn kernel_random_gen() {
         let min_value: u64 = 0;
-        let krandom = collect();
+        let krandom = collect().expect("collecting random number generator information");
         assert!(krandom.entropy_available.unwrap_or_default().ge(&min_value));
         assert!(krandom.pool_size.unwrap_or_default().ge(&min_value));
         assert!(krandom

@@ -1,9 +1,7 @@
 use procsys::loadavg;
 
 fn main() {
-    env_logger::init();
-
-    let sysload = loadavg::collect();
+    let sysload = loadavg::collect().expect("system load average");
 
     println!("load average 1 : {}", sysload.load1);
     println!("load average 5 : {}", sysload.load5);

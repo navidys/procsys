@@ -1,6 +1,9 @@
 use serde::Serialize;
 
-use crate::utils;
+use crate::{
+    error::{CollectResult, MetricError},
+    utils,
+};
 
 /// NetProtocol represents a single line parsed from /proc/net/protocols
 #[derive(Debug, Serialize, Clone, Default)]
@@ -58,15 +61,15 @@ impl NetProtocolCapabilities {
 /// ```
 /// use procsys::net_protocols;
 ///
-/// let netprots = net_protocols::collect();
+/// let netprots = net_protocols::collect().expect("network protocols");
 /// let json_output = serde_json::to_string_pretty(&netprots).unwrap();
 /// println!("{}", json_output);
 ///
 /// ```
-pub fn collect() -> Vec<NetProtocol> {
+pub fn collect() -> CollectResult<Vec<NetProtocol>> {
     let mut netprotos: Vec<NetProtocol> = Vec::new();
 
-    let netprotos_info: Vec<String> = utils::read_file_lines("/proc/net/protocols");
+    let netprotos_info: Vec<String> = utils::read_file_lines("/proc/net/protocols")?;
     let header: Vec<&str> = netprotos_info[0]
         .trim()
         .split(' ')
@@ -86,13 +89,11 @@ pub fn collect() -> Vec<NetProtocol> {
         if (sp_included && net_info_fields.len() < 27)
             || (!sp_included && net_info_fields.len() < 26)
         {
-            log::error!(
-                "invalid net protocols item fields number {}: {:?}",
+            return Err(MetricError::InvalidFieldNumberError(
+                "net protocols".to_string(),
                 net_info_fields.len(),
-                net_info_fields,
-            );
-
-            continue;
+                line.to_owned(),
+            ));
         }
 
         let mut net_proto = NetProtocol::new();
@@ -146,7 +147,7 @@ pub fn collect() -> Vec<NetProtocol> {
         netprotos.push(net_proto);
     }
 
-    netprotos
+    Ok(netprotos)
 }
 
 #[cfg(test)]
@@ -155,8 +156,7 @@ mod tests {
 
     #[test]
     fn net_protocols() {
-        let netprotos = collect();
-
+        let netprotos = collect().expect("collecting network protocols");
         assert!(!netprotos.is_empty());
 
         for protocol in netprotos {

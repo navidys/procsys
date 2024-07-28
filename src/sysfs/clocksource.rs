@@ -3,7 +3,7 @@ use std::{fs, path::Path};
 use serde::Serialize;
 use walkdir::WalkDir;
 
-use crate::error::MetricError;
+use crate::error::{CollectResult, MetricError};
 
 enum ClocksourceInfo {
     AvailableClockSource,
@@ -48,7 +48,7 @@ impl Clocksource {
 /// ```
 /// use procsys::sysfs::clocksource;
 ///
-/// let clocksources = clocksource::collect();
+/// let clocksources = clocksource::collect().expect("clocksource information");
 ///
 /// for clock_src in clocksources {
 ///     println!("name: {}", clock_src.name);
@@ -57,7 +57,7 @@ impl Clocksource {
 /// }
 ///
 /// ```
-pub fn collect() -> Vec<Clocksource> {
+pub fn collect() -> CollectResult<Vec<Clocksource>> {
     let mut clock_sources = Vec::new();
     let clock_source_path = Path::new("/sys/devices/system/clocksource");
 
@@ -88,14 +88,14 @@ pub fn collect() -> Vec<Clocksource> {
             ClocksourceInfo::CurrentClockSource,
             &clocksource_name,
             clock_source_path,
-        )
+        )?
         .unwrap_or_default();
 
         let available_clocksource = collect_clocksource_info(
             ClocksourceInfo::AvailableClockSource,
             &clocksource_name,
             clock_source_path,
-        )
+        )?
         .unwrap_or_default()
         .split(' ')
         .map(|v| v.to_string())
@@ -108,23 +108,21 @@ pub fn collect() -> Vec<Clocksource> {
         ));
     }
 
-    clock_sources
+    Ok(clock_sources)
 }
 
 fn collect_clocksource_info(
     info: ClocksourceInfo,
     name: &str,
     class_path: &Path,
-) -> Option<String> {
+) -> CollectResult<Option<String>> {
     let info_str = info.into_string();
     let info_path = Path::new(class_path).join(name).join(info_str);
 
     match fs::read_to_string(info_path.as_path()) {
-        Ok(content) => return Some(content.trim().to_string()),
-        Err(err) => log::error!("{}", MetricError::IOError(info_path, err)),
+        Ok(content) => Ok(Some(content.trim().to_string())),
+        Err(err) => Err(MetricError::IOError(info_path, err)),
     }
-
-    None
 }
 
 #[cfg(test)]
@@ -134,7 +132,7 @@ mod tests {
 
     #[test]
     fn clocksource_collect() {
-        let clock_sources = collect();
+        let clock_sources = collect().expect("collecting clock source information");
 
         assert!(!clock_sources.is_empty());
 

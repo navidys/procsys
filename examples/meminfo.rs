@@ -1,9 +1,7 @@
 use procsys::meminfo;
 
 fn main() {
-    env_logger::init();
-
-    let sys_meminfo = meminfo::collect();
+    let sys_meminfo = meminfo::collect().expect("memory information");
 
     match serde_json::to_string_pretty(&sys_meminfo) {
         Ok(output) => println!("{}", output),

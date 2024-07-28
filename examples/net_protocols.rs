@@ -1,9 +1,7 @@
 use procsys::net_protocols;
 
 fn main() {
-    env_logger::init();
-
-    let netprotocols = net_protocols::collect();
+    let netprotocols = net_protocols::collect().expect("network protocols");
 
     match serde_json::to_string_pretty(&netprotocols) {
         Ok(output) => println!("{}", output),

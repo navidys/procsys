@@ -1,9 +1,7 @@
 use procsys::sysfs;
 
 fn main() {
-    env_logger::init();
-
-    let clocksources = sysfs::clocksource::collect();
+    let clocksources = sysfs::clocksource::collect().expect("clock source information");
 
     for clock_src in &clocksources {
         println!("name: {}", clock_src.name);

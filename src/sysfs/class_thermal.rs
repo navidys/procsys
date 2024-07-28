@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use serde::Serialize;
 use walkdir::WalkDir;
 
-use crate::utils;
+use crate::{error::CollectResult, utils};
 
 enum ThermalZoneInfo {
     ZoneType,
@@ -49,7 +49,7 @@ impl ThermalZone {
 /// ```
 /// use procsys::sysfs::class_thermal;
 ///
-///let thermal_devices = class_thermal::collect();
+///let thermal_devices = class_thermal::collect().expect("thermal information");
 ///
 /// for tdev in &thermal_devices {
 ///     println!("name: {}", tdev.name);
@@ -63,7 +63,7 @@ impl ThermalZone {
 /// println!("{}", json_output);
 ///
 /// ```
-pub fn collect() -> Vec<ThermalZone> {
+pub fn collect() -> CollectResult<Vec<ThermalZone>> {
     let mut thermal_zone_devices = Vec::new();
     let thermal_zone_class_path = Path::new("/sys/class/thermal/");
 
@@ -89,7 +89,7 @@ pub fn collect() -> Vec<ThermalZone> {
             match ThermalZoneInfo::from(&tdev_info_name) {
                 ThermalZoneInfo::Mode => {
                     if let Some(c) =
-                        utils::collect_info_string(&tdev_info_name, tdev_path.as_path())
+                        utils::collect_info_string(&tdev_info_name, tdev_path.as_path())?
                     {
                         match c.as_str() {
                             "enabled" => thermal_device.mode = Some(true),
@@ -99,24 +99,25 @@ pub fn collect() -> Vec<ThermalZone> {
                     }
                 }
                 ThermalZoneInfo::Temp => {
-                    if let Some(c) = utils::collect_info_i64(&tdev_info_name, tdev_path.as_path()) {
+                    if let Some(c) = utils::collect_info_i64(&tdev_info_name, tdev_path.as_path())?
+                    {
                         thermal_device.temp = c;
                     }
                 }
                 ThermalZoneInfo::Passive => {
                     thermal_device.passive =
-                        utils::collect_info_u64(&tdev_info_name, tdev_path.as_path());
+                        utils::collect_info_u64(&tdev_info_name, tdev_path.as_path())?;
                 }
                 ThermalZoneInfo::Policy => {
                     if let Some(c) =
-                        utils::collect_info_string(&tdev_info_name, tdev_path.as_path())
+                        utils::collect_info_string(&tdev_info_name, tdev_path.as_path())?
                     {
                         thermal_device.policy = c;
                     }
                 }
                 ThermalZoneInfo::ZoneType => {
                     if let Some(c) =
-                        utils::collect_info_string(&tdev_info_name, tdev_path.as_path())
+                        utils::collect_info_string(&tdev_info_name, tdev_path.as_path())?
                     {
                         thermal_device.zone_type = c;
                     }
@@ -128,7 +129,7 @@ pub fn collect() -> Vec<ThermalZone> {
         thermal_zone_devices.push(thermal_device);
     }
 
-    thermal_zone_devices
+    Ok(thermal_zone_devices)
 }
 
 #[cfg(test)]
@@ -137,7 +138,7 @@ mod tests {
 
     #[test]
     fn thermal_devices() {
-        let tdev = collect();
+        let tdev = collect().expect("collecting system thermal information");
         assert!(!tdev.is_empty())
     }
 }

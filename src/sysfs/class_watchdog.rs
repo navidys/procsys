@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use serde::Serialize;
 use walkdir::WalkDir;
 
-use crate::utils;
+use crate::{error::CollectResult, utils};
 
 enum WatchdogInfo {
     BootStatus,
@@ -76,7 +76,7 @@ impl Watchdog {
 /// ```
 /// use procsys::sysfs::class_watchdog;
 ///
-/// let watchdog_devices = class_watchdog::collect();
+/// let watchdog_devices = class_watchdog::collect().expect("watchdog information");
 ///
 /// for wdev in &watchdog_devices {
 ///     println!("name: {}", wdev.name);
@@ -90,7 +90,7 @@ impl Watchdog {
 /// println!("{}", json_output);
 ///
 /// ```
-pub fn collect() -> Vec<Watchdog> {
+pub fn collect() -> CollectResult<Vec<Watchdog>> {
     let mut devices = Vec::new();
     let watchdog_class_path = Path::new("/sys/class/watchdog/");
     for device in utils::list_dir_content(watchdog_class_path, "", "watchdog") {
@@ -120,59 +120,59 @@ pub fn collect() -> Vec<Watchdog> {
             match WatchdogInfo::from(wdev_filename.as_str()) {
                 WatchdogInfo::BootStatus => {
                     watchdog_dev.boot_status =
-                        utils::collect_info_i64(&wdev_filename, wdev_path.as_path());
+                        utils::collect_info_i64(&wdev_filename, wdev_path.as_path())?;
                 }
                 WatchdogInfo::Options => {
                     watchdog_dev.options =
-                        utils::collect_info_string(&wdev_filename, wdev_path.as_path());
+                        utils::collect_info_string(&wdev_filename, wdev_path.as_path())?;
                 }
                 WatchdogInfo::FwVersion => {
                     watchdog_dev.fw_version =
-                        utils::collect_info_i64(&wdev_filename, wdev_path.as_path());
+                        utils::collect_info_i64(&wdev_filename, wdev_path.as_path())?;
                 }
                 WatchdogInfo::Identity => {
                     watchdog_dev.identity =
-                        utils::collect_info_string(&wdev_filename, wdev_path.as_path());
+                        utils::collect_info_string(&wdev_filename, wdev_path.as_path())?;
                 }
                 WatchdogInfo::Nowayout => {
                     watchdog_dev.nowayout =
-                        utils::collect_info_i64(&wdev_filename, wdev_path.as_path());
+                        utils::collect_info_i64(&wdev_filename, wdev_path.as_path())?;
                 }
                 WatchdogInfo::State => {
                     watchdog_dev.state =
-                        utils::collect_info_string(&wdev_filename, wdev_path.as_path());
+                        utils::collect_info_string(&wdev_filename, wdev_path.as_path())?;
                 }
                 WatchdogInfo::Status => {
                     watchdog_dev.status =
-                        utils::collect_info_string(&wdev_filename, wdev_path.as_path());
+                        utils::collect_info_string(&wdev_filename, wdev_path.as_path())?;
                 }
                 WatchdogInfo::Timeleft => {
                     watchdog_dev.timeleft =
-                        utils::collect_info_i64(&wdev_filename, wdev_path.as_path());
+                        utils::collect_info_i64(&wdev_filename, wdev_path.as_path())?;
                 }
                 WatchdogInfo::Timeout => {
                     watchdog_dev.timeout =
-                        utils::collect_info_i64(&wdev_filename, wdev_path.as_path());
+                        utils::collect_info_i64(&wdev_filename, wdev_path.as_path())?;
                 }
                 WatchdogInfo::MinTimeout => {
                     watchdog_dev.min_timeout =
-                        utils::collect_info_i64(&wdev_filename, wdev_path.as_path());
+                        utils::collect_info_i64(&wdev_filename, wdev_path.as_path())?;
                 }
                 WatchdogInfo::MaxTimeout => {
                     watchdog_dev.max_timeout =
-                        utils::collect_info_i64(&wdev_filename, wdev_path.as_path());
+                        utils::collect_info_i64(&wdev_filename, wdev_path.as_path())?;
                 }
                 WatchdogInfo::Pretimeout => {
                     watchdog_dev.pretimeout =
-                        utils::collect_info_i64(&wdev_filename, wdev_path.as_path());
+                        utils::collect_info_i64(&wdev_filename, wdev_path.as_path())?;
                 }
                 WatchdogInfo::PretimeoutGovernor => {
                     watchdog_dev.pretimeout_governor =
-                        utils::collect_info_string(&wdev_filename, wdev_path.as_path());
+                        utils::collect_info_string(&wdev_filename, wdev_path.as_path())?;
                 }
                 WatchdogInfo::AccessCs0 => {
                     watchdog_dev.access_cs0 =
-                        utils::collect_info_i64(&wdev_filename, wdev_path.as_path());
+                        utils::collect_info_i64(&wdev_filename, wdev_path.as_path())?;
                 }
                 WatchdogInfo::Unknown => {}
             }
@@ -181,7 +181,7 @@ pub fn collect() -> Vec<Watchdog> {
         devices.push(watchdog_dev);
     }
 
-    devices
+    Ok(devices)
 }
 
 #[cfg(test)]
@@ -190,7 +190,7 @@ mod tests {
 
     #[test]
     fn watchdog_devices() {
-        let wdev = collect();
+        let wdev = collect().expect("collecting system watchdog information");
         assert!(!wdev.is_empty());
     }
 }

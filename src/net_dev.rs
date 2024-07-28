@@ -1,6 +1,9 @@
 use serde::Serialize;
 
-use crate::utils;
+use crate::{
+    error::{CollectResult, MetricError},
+    utils,
+};
 
 /// NetDev contains a network device information parsed from /proc/net/dev
 #[derive(Debug, Serialize, Clone, Default)]
@@ -35,17 +38,17 @@ impl NetDev {
 /// ```
 /// use procsys::net_dev;
 ///
-/// let net_devices = net_dev::collect();
+/// let net_devices = net_dev::collect().expect("network devices");
 /// let json_output = serde_json::to_string_pretty(&net_devices).unwrap();
 /// println!("{}", json_output);
 ///
 /// ```
-pub fn collect() -> Vec<NetDev> {
+pub fn collect() -> CollectResult<Vec<NetDev>> {
     let mut net_devices = Vec::new();
 
     let mut line_index = 0;
 
-    for line in utils::read_file_lines("/proc/net/dev") {
+    for line in utils::read_file_lines("/proc/net/dev")? {
         line_index += 1;
 
         if line_index <= 2 {
@@ -55,12 +58,11 @@ pub fn collect() -> Vec<NetDev> {
         let fields: Vec<&str> = line.trim().split(' ').filter(|s| !s.is_empty()).collect();
 
         if fields.len() != 17 {
-            log::error!(
-                "invalid network fields number {}: {:?}",
+            return Err(MetricError::InvalidFieldNumberError(
+                "network".to_string(),
                 fields.len(),
-                fields,
-            );
-            continue;
+                line,
+            ));
         }
 
         let mut net_device = NetDev::new();
@@ -87,7 +89,7 @@ pub fn collect() -> Vec<NetDev> {
         line_index += 1;
     }
 
-    net_devices
+    Ok(net_devices)
 }
 
 #[cfg(test)]
@@ -97,8 +99,7 @@ mod tests {
     #[test]
     fn net_devices() {
         let minvalue = 0;
-        let ndevices = collect();
-        assert!(!ndevices.is_empty());
+        let ndevices = collect().expect("collecting network devices");
 
         for net_dev in ndevices {
             assert!(!net_dev.name.is_empty());

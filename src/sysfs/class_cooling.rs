@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use serde::Serialize;
 use walkdir::WalkDir;
 
-use crate::utils;
+use crate::{error::CollectResult, utils};
 
 enum CoolingInfo {
     CoolingType,
@@ -43,12 +43,12 @@ impl Cooling {
 /// ```
 /// use procsys::sysfs::class_cooling;
 ///
-/// let cooling_devices = class_cooling::collect();
+/// let cooling_devices = class_cooling::collect().expect("cooling information");
 /// let json_output = serde_json::to_string_pretty(&cooling_devices).unwrap();
 /// println!("{}", json_output);
 ///
 /// ```
-pub fn collect() -> Vec<Cooling> {
+pub fn collect() -> CollectResult<Vec<Cooling>> {
     let mut cooling_devs = Vec::new();
     let cooling_class_path = Path::new("/sys/class/thermal/");
 
@@ -74,18 +74,20 @@ pub fn collect() -> Vec<Cooling> {
             match CoolingInfo::from(&cdev_info_name) {
                 CoolingInfo::CoolingType => {
                     if let Some(c) =
-                        utils::collect_info_string(&cdev_info_name, cdev_path.as_path())
+                        utils::collect_info_string(&cdev_info_name, cdev_path.as_path())?
                     {
                         cooling_device.cooling_type = c;
                     }
                 }
                 CoolingInfo::MaxState => {
-                    if let Some(c) = utils::collect_info_i64(&cdev_info_name, cdev_path.as_path()) {
+                    if let Some(c) = utils::collect_info_i64(&cdev_info_name, cdev_path.as_path())?
+                    {
                         cooling_device.max_state = c;
                     }
                 }
                 CoolingInfo::CurState => {
-                    if let Some(c) = utils::collect_info_i64(&cdev_info_name, cdev_path.as_path()) {
+                    if let Some(c) = utils::collect_info_i64(&cdev_info_name, cdev_path.as_path())?
+                    {
                         cooling_device.cur_state = c;
                     }
                 }
@@ -96,7 +98,7 @@ pub fn collect() -> Vec<Cooling> {
         cooling_devs.push(cooling_device);
     }
 
-    cooling_devs
+    Ok(cooling_devs)
 }
 
 #[cfg(test)]
@@ -105,7 +107,7 @@ mod tests {
 
     #[test]
     fn cooling_devices() {
-        let cdev = collect();
+        let cdev = collect().expect("collecting cooling information");
         assert!(!cdev.is_empty())
     }
 }
