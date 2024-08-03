@@ -1,6 +1,7 @@
 #![doc = include_str!("../README.md")]
 
 pub mod buddyinfo;
+pub mod cmdline;
 pub mod cpuinfo;
 pub mod error;
 pub mod kernel_random;
