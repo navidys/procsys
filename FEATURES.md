@@ -1,6 +1,8 @@
 Supported Features
 * ✅ `/proc/buddyinfo`
 
+* ✅ `/proc/cmdline`
+
 * ✅ `/proc/cpuinfo`
 
 * ✅ `/proc/loadavg`
