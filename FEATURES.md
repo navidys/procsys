@@ -20,6 +20,8 @@ Supported Features
     * write_wakeup_threshold
     * read_wakeup_threshold
 
+* ✅ `/proc/swaps`
+
 * ✅ `/sys/class/dmi/id`
     * bios_date
     * bios_release
