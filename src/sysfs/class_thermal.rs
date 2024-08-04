@@ -146,18 +146,24 @@ mod tests {
         let tdev =
             collect_from(thermal_zone_class_path).expect("collecting system thermal information");
         assert!(tdev.len().eq(&2));
-        assert!(tdev[0].name.eq("thermal_zone0"));
-        assert!(tdev[0].zone_type.eq("bcm2835_thermal"));
-        assert!(tdev[0].policy.eq("step_wise"));
-        assert!(tdev[0].mode.is_none());
-        assert!(tdev[0].temp.eq(&49925));
-        assert!(tdev[0].passive.is_none());
-
-        assert!(tdev[1].name.eq("thermal_zone1"));
-        assert!(tdev[1].zone_type.eq("acpitz"));
-        assert!(tdev[1].policy.eq("step_wise"));
-        assert!(tdev[1].mode.unwrap());
-        assert!(tdev[1].temp.eq(&-44000));
-        assert!(tdev[1].passive.unwrap().eq(&0));
+        for thermal in tdev {
+            match thermal.name.as_str() {
+                "thermal_zone0" => {
+                    assert_eq!(thermal.zone_type, "bcm2835_thermal");
+                    assert_eq!(thermal.policy, "step_wise");
+                    assert!(thermal.mode.is_none());
+                    assert!(thermal.temp.eq(&49925));
+                    assert!(thermal.passive.is_none());
+                }
+                "thermal_zone1" => {
+                    assert_eq!(thermal.zone_type, "acpitz");
+                    assert_eq!(thermal.policy, "step_wise");
+                    assert!(thermal.mode.unwrap());
+                    assert!(thermal.temp.eq(&-44000));
+                    assert!(thermal.passive.unwrap().eq(&0));
+                }
+                _ => panic!("invalid thermal zone: {}", thermal.name),
+            }
+        }
     }
 }
