@@ -62,7 +62,7 @@ pub fn collect() -> CollectResult<Vec<Clocksource>> {
     collect_from(clock_source_path)
 }
 
-pub fn collect_from(base_path: &Path) -> CollectResult<Vec<Clocksource>> {
+fn collect_from(base_path: &Path) -> CollectResult<Vec<Clocksource>> {
     let mut clock_sources = Vec::new();
 
     for clock_dev in WalkDir::new(base_path).into_iter().filter_map(|e| e.ok()) {
