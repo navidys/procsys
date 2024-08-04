@@ -210,9 +210,13 @@ impl Meminfo {
 ///
 /// ```
 pub fn collect() -> CollectResult<Meminfo> {
+    collect_from("/proc/meminfo")
+}
+
+fn collect_from(filename: &str) -> CollectResult<Meminfo> {
     let mut meminfo = Meminfo::new();
 
-    for line in utils::read_file_lines("/proc/meminfo")? {
+    for line in utils::read_file_lines(filename)? {
         let item_fields: Vec<&str> = line.trim().split(':').filter(|s| !s.is_empty()).collect();
 
         if item_fields.len() != 2 {
@@ -308,68 +312,65 @@ mod tests {
 
     #[test]
     fn mem_stats() {
-        let min_value: u64 = 0;
-        let meminfo = collect().expect("collecting memory information");
+        let meminfo =
+            collect_from("test_data/fixtures/proc/meminfo").expect("collecting memory information");
 
-        assert!(meminfo.mem_total.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.mem_free.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.mem_available.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.buffers.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.cached.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.swap_cached.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.active.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.inactive.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.active_anon.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.inactive_anon.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.active_file.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.inactive_file.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.unevictable.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.mlocked.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.swap_total.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.swap_free.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.z_swap.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.z_swapped.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.dirty.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.writeback.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.annon_pages.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.mapped.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.shmem.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.k_reclaimable.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.slap.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.s_reclaimable.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.s_unreclaim.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.kernel_stack.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.page_tables.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.sec_page_tables.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.nfs_unstable.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.bounce.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.writeback_tmp.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.commit_limit.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.committed_as.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.vmalloc_total.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.vmalloc_used.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.vmalloc_chunk.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.per_cpu.unwrap_or_default().ge(&min_value));
-        assert!(meminfo
-            .hardware_corrupted
-            .unwrap_or_default()
-            .ge(&min_value));
-        assert!(meminfo.annon_huge_pages.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.shmem_huge_pages.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.shmem_pmd_mapped.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.file_huge_pages.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.file_pmd_mapped.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.cma_total.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.cma_free.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.unaccepted.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.huge_pages_total.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.huge_pages_free.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.huge_pages_rsvd.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.huge_pages_surp.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.huge_page_size.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.huge_tlb.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.direct_map_4k.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.direct_map_2m.unwrap_or_default().ge(&min_value));
-        assert!(meminfo.direct_map_1g.unwrap_or_default().ge(&min_value));
+        assert_eq!(meminfo.mem_total.unwrap(), 16042172416);
+        assert_eq!(meminfo.mem_free.unwrap(), 450891776);
+        assert_eq!(meminfo.mem_available, None);
+        assert_eq!(meminfo.buffers.unwrap(), 1044611072);
+        assert_eq!(meminfo.cached.unwrap(), 12295823360);
+        assert_eq!(meminfo.swap_cached.unwrap(), 0);
+        assert_eq!(meminfo.active.unwrap(), 6923546624);
+        assert_eq!(meminfo.inactive.unwrap(), 6689492992);
+        assert_eq!(meminfo.active_anon.unwrap(), 273670144);
+        assert_eq!(meminfo.inactive_anon.unwrap(), 274432);
+        assert_eq!(meminfo.active_file.unwrap(), 6649876480);
+        assert_eq!(meminfo.inactive_file.unwrap(), 6689218560);
+        assert_eq!(meminfo.unevictable.unwrap(), 0);
+        assert_eq!(meminfo.mlocked.unwrap(), 0);
+        assert_eq!(meminfo.swap_total.unwrap(), 0);
+        assert_eq!(meminfo.swap_free.unwrap(), 0);
+        assert_eq!(meminfo.z_swap, None);
+        assert_eq!(meminfo.z_swapped, None);
+        assert_eq!(meminfo.dirty.unwrap(), 786432);
+        assert_eq!(meminfo.writeback.unwrap(), 0);
+        assert_eq!(meminfo.annon_pages.unwrap(), 272605184);
+        assert_eq!(meminfo.mapped.unwrap(), 45264896);
+        assert_eq!(meminfo.shmem.unwrap(), 1339392);
+        assert_eq!(meminfo.k_reclaimable, None);
+        assert_eq!(meminfo.slap.unwrap(), 1850638336);
+        assert_eq!(meminfo.s_reclaimable.unwrap(), 1779838976);
+        assert_eq!(meminfo.s_unreclaim.unwrap(), 70799360);
+        assert_eq!(meminfo.kernel_stack.unwrap(), 1654784);
+        assert_eq!(meminfo.page_tables.unwrap(), 5414912);
+        assert_eq!(meminfo.sec_page_tables, None);
+        assert_eq!(meminfo.nfs_unstable.unwrap(), 0);
+        assert_eq!(meminfo.bounce.unwrap(), 0);
+        assert_eq!(meminfo.writeback_tmp.unwrap(), 0);
+        assert_eq!(meminfo.commit_limit.unwrap(), 8021086208);
+        assert_eq!(meminfo.committed_as.unwrap(), 543584256);
+        assert_eq!(meminfo.vmalloc_total.unwrap(), 34359738367 * 1024);
+        assert_eq!(meminfo.vmalloc_used.unwrap(), 37474304);
+        assert_eq!(meminfo.vmalloc_chunk.unwrap(), 34359637840 * 1024);
+        assert_eq!(meminfo.per_cpu.unwrap(), 26804224);
+        assert_eq!(meminfo.hardware_corrupted.unwrap(), 0);
+        assert_eq!(meminfo.annon_huge_pages.unwrap(), 12582912);
+        assert_eq!(meminfo.shmem_huge_pages, None);
+        assert_eq!(meminfo.shmem_pmd_mapped, None);
+        assert_eq!(meminfo.file_huge_pages, None);
+        assert_eq!(meminfo.file_pmd_mapped, None);
+        assert_eq!(meminfo.cma_total, None);
+        assert_eq!(meminfo.cma_free, None);
+        assert_eq!(meminfo.unaccepted, None);
+        assert_eq!(meminfo.huge_pages_total.unwrap(), 0);
+        assert_eq!(meminfo.huge_pages_free.unwrap(), 0);
+        assert_eq!(meminfo.huge_pages_rsvd.unwrap(), 0);
+        assert_eq!(meminfo.huge_pages_surp.unwrap(), 0);
+        assert_eq!(meminfo.huge_page_size.unwrap(), 2097152);
+        assert_eq!(meminfo.huge_tlb, None);
+        assert_eq!(meminfo.direct_map_4k.unwrap(), 93323264);
+        assert_eq!(meminfo.direct_map_2m.unwrap(), 16424894464);
+        assert_eq!(meminfo.direct_map_1g, None);
     }
 }
