@@ -32,9 +32,13 @@ impl BuddyInfo {
 ///
 /// ```
 pub fn collect() -> CollectResult<Vec<BuddyInfo>> {
+    collect_from("/proc/buddyinfo")
+}
+
+fn collect_from(base_path: &str) -> CollectResult<Vec<BuddyInfo>> {
     let mut system_buddyinfo = Vec::new();
 
-    for line in utils::read_file_lines("/proc/buddyinfo")? {
+    for line in utils::read_file_lines(base_path)? {
         let fields: Vec<&str> = line.trim().split(' ').filter(|s| !s.is_empty()).collect();
 
         if fields.len() < 4 {
@@ -68,11 +72,28 @@ mod tests {
 
     #[test]
     fn buddyinfo() {
-        let binfolist = collect().expect("collecting buddy information");
+        let binfolist = collect_from("test_data/fixtures/proc/buddyinfo")
+            .expect("collecting buddy information");
+
+        assert_eq!(binfolist.len(), 3);
+
         for binfo in binfolist {
-            assert!(!binfo.node.is_empty());
-            assert!(!binfo.zone.is_empty());
-            assert!(!binfo.sizes.is_empty())
+            assert_eq!(binfo.node, "0");
+            match binfo.zone.as_str() {
+                "DMA" => {
+                    assert_eq!(binfo.sizes, [1, 0, 1, 0, 2, 1, 1, 0, 1, 1, 3]);
+                }
+                "DMA32" => {
+                    assert_eq!(binfo.sizes, [759, 572, 791, 475, 194, 45, 12, 0, 0, 0, 0]);
+                }
+                "Normal" => {
+                    assert_eq!(
+                        binfo.sizes,
+                        [4381, 1093, 185, 1530, 567, 102, 4, 0, 0, 0, 0]
+                    );
+                }
+                _ => panic!("invalid zone name: {}", binfo.zone),
+            }
         }
     }
 }
