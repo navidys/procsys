@@ -44,11 +44,15 @@ impl NetDev {
 ///
 /// ```
 pub fn collect() -> CollectResult<Vec<NetDev>> {
+    collect_from("/proc/net/dev")
+}
+
+fn collect_from(filename: &str) -> CollectResult<Vec<NetDev>> {
     let mut net_devices = Vec::new();
 
     let mut line_index = 0;
 
-    for line in utils::read_file_lines("/proc/net/dev")? {
+    for line in utils::read_file_lines(filename)? {
         line_index += 1;
 
         if line_index <= 2 {
@@ -98,27 +102,49 @@ mod tests {
 
     #[test]
     fn net_devices() {
-        let minvalue = 0;
-        let ndevices = collect().expect("collecting network devices");
+        let ndevices =
+            collect_from("test_data/fixtures/proc/net/dev").expect("collecting network devices");
 
         for net_dev in ndevices {
-            assert!(!net_dev.name.is_empty());
-            assert!(net_dev.rx_bytes.ge(&minvalue));
-            assert!(net_dev.rx_packets.ge(&minvalue));
-            assert!(net_dev.rx_errors.ge(&minvalue));
-            assert!(net_dev.rx_dropped.ge(&minvalue));
-            assert!(net_dev.rx_fifo.ge(&minvalue));
-            assert!(net_dev.rx_frame.ge(&minvalue));
-            assert!(net_dev.rx_compressed.ge(&minvalue));
-            assert!(net_dev.rx_multicast.ge(&minvalue));
-            assert!(net_dev.tx_bytes.ge(&minvalue));
-            assert!(net_dev.tx_packets.ge(&minvalue));
-            assert!(net_dev.tx_errors.ge(&minvalue));
-            assert!(net_dev.tx_dropped.ge(&minvalue));
-            assert!(net_dev.tx_fifo.ge(&minvalue));
-            assert!(net_dev.tx_collisions.ge(&minvalue));
-            assert!(net_dev.tx_carrier.ge(&minvalue));
-            assert!(net_dev.tx_compressed.ge(&minvalue));
+            match net_dev.name.as_str() {
+                "vethf345468" => {
+                    assert_eq!(net_dev.rx_bytes, 648);
+                    assert_eq!(net_dev.rx_packets, 8);
+                    assert_eq!(net_dev.rx_errors, 0);
+                    assert_eq!(net_dev.rx_dropped, 0);
+                    assert_eq!(net_dev.rx_fifo, 0);
+                    assert_eq!(net_dev.rx_frame, 0);
+                    assert_eq!(net_dev.rx_compressed, 0);
+                    assert_eq!(net_dev.rx_multicast, 0);
+                    assert_eq!(net_dev.tx_bytes, 438);
+                    assert_eq!(net_dev.tx_packets, 5);
+                    assert_eq!(net_dev.tx_errors, 0);
+                    assert_eq!(net_dev.tx_dropped, 0);
+                    assert_eq!(net_dev.tx_fifo, 0);
+                    assert_eq!(net_dev.tx_collisions, 0);
+                    assert_eq!(net_dev.tx_carrier, 0);
+                    assert_eq!(net_dev.tx_compressed, 0);
+                }
+                "lo" => {
+                    assert_eq!(net_dev.rx_bytes, 1664039048);
+                    assert_eq!(net_dev.rx_packets, 1566805);
+                    assert_eq!(net_dev.rx_errors, 0);
+                    assert_eq!(net_dev.rx_dropped, 0);
+                    assert_eq!(net_dev.rx_fifo, 0);
+                    assert_eq!(net_dev.rx_frame, 0);
+                    assert_eq!(net_dev.rx_compressed, 0);
+                    assert_eq!(net_dev.rx_multicast, 0);
+                    assert_eq!(net_dev.tx_bytes, 1664039048);
+                    assert_eq!(net_dev.tx_packets, 1566805);
+                    assert_eq!(net_dev.tx_errors, 0);
+                    assert_eq!(net_dev.tx_dropped, 0);
+                    assert_eq!(net_dev.tx_fifo, 0);
+                    assert_eq!(net_dev.tx_collisions, 0);
+                    assert_eq!(net_dev.tx_carrier, 0);
+                    assert_eq!(net_dev.tx_compressed, 0);
+                }
+                _ => panic!("invalid network name: {}", net_dev.name),
+            }
         }
     }
 }

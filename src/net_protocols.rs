@@ -67,9 +67,13 @@ impl NetProtocolCapabilities {
 ///
 /// ```
 pub fn collect() -> CollectResult<Vec<NetProtocol>> {
+    collect_from("/proc/net/protocols")
+}
+
+fn collect_from(filename: &str) -> CollectResult<Vec<NetProtocol>> {
     let mut netprotos: Vec<NetProtocol> = Vec::new();
 
-    let netprotos_info: Vec<String> = utils::read_file_lines("/proc/net/protocols")?;
+    let netprotos_info: Vec<String> = utils::read_file_lines(filename)?;
     let header: Vec<&str> = netprotos_info[0]
         .trim()
         .split(' ')
@@ -156,16 +160,127 @@ mod tests {
 
     #[test]
     fn net_protocols() {
-        let netprotos = collect().expect("collecting network protocols");
-        assert!(!netprotos.is_empty());
+        let netprotos = collect_from("test_data/fixtures/proc/net/protocols")
+            .expect("collecting network protocols");
+
+        assert_eq!(netprotos.len(), 4);
 
         for protocol in netprotos {
-            assert!(!protocol.name.is_empty());
-            assert!(protocol.size.ge(&0));
-            assert!(protocol.sockets.ge(&0));
-            assert!(protocol.memory.ge(&-1));
-            assert!(protocol.max_header.ge(&0));
-            assert!(!protocol.module_name.is_empty());
+            match protocol.name.as_str() {
+                "PACKET" => {
+                    assert_eq!(protocol.size, 1344);
+                    assert_eq!(protocol.sockets, 2);
+                    assert_eq!(protocol.memory, -1);
+                    assert_eq!(protocol.pressure, None);
+                    assert_eq!(protocol.max_header, 0);
+                    assert_eq!(protocol.slab, false);
+                    assert_eq!(protocol.module_name, "kernel");
+                    assert_eq!(protocol.capabilities.close, false);
+                    assert_eq!(protocol.capabilities.connect, false);
+                    assert_eq!(protocol.capabilities.disconnect, false);
+                    assert_eq!(protocol.capabilities.accept, false);
+                    assert_eq!(protocol.capabilities.ioctl, false);
+                    assert_eq!(protocol.capabilities.init, false);
+                    assert_eq!(protocol.capabilities.destroy, false);
+                    assert_eq!(protocol.capabilities.shutdown, false);
+                    assert_eq!(protocol.capabilities.set_socketopt, false);
+                    assert_eq!(protocol.capabilities.get_socketopt, false);
+                    assert_eq!(protocol.capabilities.send_msg, false);
+                    assert_eq!(protocol.capabilities.recv_msg, false);
+                    assert_eq!(protocol.capabilities.send_page, Some(false));
+                    assert_eq!(protocol.capabilities.bind, false);
+                    assert_eq!(protocol.capabilities.backlog_rcv, false);
+                    assert_eq!(protocol.capabilities.hash, false);
+                    assert_eq!(protocol.capabilities.unhash, false);
+                    assert_eq!(protocol.capabilities.get_port, false);
+                    assert_eq!(protocol.capabilities.entry_memory_pressure, false);
+                }
+                "UDPv6" => {
+                    assert_eq!(protocol.size, 1216);
+                    assert_eq!(protocol.sockets, 10);
+                    assert_eq!(protocol.memory, 57);
+                    assert_eq!(protocol.pressure, None);
+                    assert_eq!(protocol.max_header, 0);
+                    assert_eq!(protocol.slab, true);
+                    assert_eq!(protocol.module_name, "kernel");
+                    assert_eq!(protocol.capabilities.close, true);
+                    assert_eq!(protocol.capabilities.connect, true);
+                    assert_eq!(protocol.capabilities.disconnect, true);
+                    assert_eq!(protocol.capabilities.accept, false);
+                    assert_eq!(protocol.capabilities.ioctl, true);
+                    assert_eq!(protocol.capabilities.init, true);
+                    assert_eq!(protocol.capabilities.destroy, true);
+                    assert_eq!(protocol.capabilities.shutdown, false);
+                    assert_eq!(protocol.capabilities.set_socketopt, true);
+                    assert_eq!(protocol.capabilities.get_socketopt, true);
+                    assert_eq!(protocol.capabilities.send_msg, true);
+                    assert_eq!(protocol.capabilities.recv_msg, true);
+                    assert_eq!(protocol.capabilities.send_page, Some(false));
+                    assert_eq!(protocol.capabilities.bind, false);
+                    assert_eq!(protocol.capabilities.backlog_rcv, false);
+                    assert_eq!(protocol.capabilities.hash, true);
+                    assert_eq!(protocol.capabilities.unhash, true);
+                    assert_eq!(protocol.capabilities.get_port, true);
+                    assert_eq!(protocol.capabilities.entry_memory_pressure, false);
+                }
+                "TCP" => {
+                    assert_eq!(protocol.size, 1984);
+                    assert_eq!(protocol.sockets, 93064);
+                    assert_eq!(protocol.memory, 1225378);
+                    assert_eq!(protocol.pressure, Some(true));
+                    assert_eq!(protocol.max_header, 320);
+                    assert_eq!(protocol.slab, true);
+                    assert_eq!(protocol.module_name, "kernel");
+                    assert_eq!(protocol.capabilities.close, true);
+                    assert_eq!(protocol.capabilities.connect, true);
+                    assert_eq!(protocol.capabilities.disconnect, true);
+                    assert_eq!(protocol.capabilities.accept, true);
+                    assert_eq!(protocol.capabilities.ioctl, true);
+                    assert_eq!(protocol.capabilities.init, true);
+                    assert_eq!(protocol.capabilities.destroy, true);
+                    assert_eq!(protocol.capabilities.shutdown, true);
+                    assert_eq!(protocol.capabilities.set_socketopt, true);
+                    assert_eq!(protocol.capabilities.get_socketopt, true);
+                    assert_eq!(protocol.capabilities.send_msg, true);
+                    assert_eq!(protocol.capabilities.recv_msg, true);
+                    assert_eq!(protocol.capabilities.send_page, Some(true));
+                    assert_eq!(protocol.capabilities.bind, false);
+                    assert_eq!(protocol.capabilities.backlog_rcv, true);
+                    assert_eq!(protocol.capabilities.hash, true);
+                    assert_eq!(protocol.capabilities.unhash, true);
+                    assert_eq!(protocol.capabilities.get_port, true);
+                    assert_eq!(protocol.capabilities.entry_memory_pressure, true);
+                }
+                "NETLINK" => {
+                    assert_eq!(protocol.size, 1040);
+                    assert_eq!(protocol.sockets, 16);
+                    assert_eq!(protocol.memory, -1);
+                    assert_eq!(protocol.pressure, None);
+                    assert_eq!(protocol.max_header, 0);
+                    assert_eq!(protocol.slab, false);
+                    assert_eq!(protocol.module_name, "kernel");
+                    assert_eq!(protocol.capabilities.close, false);
+                    assert_eq!(protocol.capabilities.connect, false);
+                    assert_eq!(protocol.capabilities.disconnect, false);
+                    assert_eq!(protocol.capabilities.accept, false);
+                    assert_eq!(protocol.capabilities.ioctl, false);
+                    assert_eq!(protocol.capabilities.init, false);
+                    assert_eq!(protocol.capabilities.destroy, false);
+                    assert_eq!(protocol.capabilities.shutdown, false);
+                    assert_eq!(protocol.capabilities.set_socketopt, false);
+                    assert_eq!(protocol.capabilities.get_socketopt, false);
+                    assert_eq!(protocol.capabilities.send_msg, false);
+                    assert_eq!(protocol.capabilities.recv_msg, false);
+                    assert_eq!(protocol.capabilities.send_page, Some(false));
+                    assert_eq!(protocol.capabilities.bind, false);
+                    assert_eq!(protocol.capabilities.backlog_rcv, false);
+                    assert_eq!(protocol.capabilities.hash, false);
+                    assert_eq!(protocol.capabilities.unhash, false);
+                    assert_eq!(protocol.capabilities.get_port, false);
+                    assert_eq!(protocol.capabilities.entry_memory_pressure, false);
+                }
+                _ => panic!("invalid protocol name: {}", protocol.name),
+            }
         }
     }
 }
