@@ -33,9 +33,13 @@ impl LoadAvg {
 /// println!("load average 15: {}", sysload.load15);
 /// ```
 pub fn collect() -> CollectResult<LoadAvg> {
+    collect_from("loadavg", Path::new("/proc"))
+}
+
+fn collect_from(filename: &str, base_path: &Path) -> CollectResult<LoadAvg> {
     let mut sysload = LoadAvg::new();
 
-    match utils::collect_info_string("loadavg", Path::new("/proc"))? {
+    match utils::collect_info_string(filename, Path::new(base_path))? {
         Some(content) => {
             let avgfields: Vec<&str> = content
                 .trim()
@@ -67,11 +71,11 @@ mod tests {
 
     #[test]
     fn sys_loadavg() {
-        let sysload = collect().expect("collecting system load average");
-        let min_sysload: f64 = 0.0;
+        let sysload = collect_from("loadavg", Path::new("test_data/fixtures/proc"))
+            .expect("collecting system load average");
 
-        assert!(sysload.load1.ge(&min_sysload));
-        assert!(sysload.load5.ge(&min_sysload));
-        assert!(sysload.load15.ge(&min_sysload));
+        assert_eq!(sysload.load1, 0.02);
+        assert_eq!(sysload.load5, 0.04);
+        assert_eq!(sysload.load15, 0.05);
     }
 }

@@ -17,6 +17,11 @@ Lines: 1
 BOOT_IMAGE=/vmlinuz-5.11.0-22-generic root=UUID=456a0345-450d-4f7b-b7c9-43e3241d99ad ro quiet splash vt.handoff=7
 Mode: 444
 # ttar - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Path: fixtures/proc/loadavg
+Lines: 1
+0.02 0.04 0.05 1/497 11947
+Mode: 444
+# ttar - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Directory: fixtures/proc/sys
 Mode: 755
 # ttar - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
