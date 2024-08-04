@@ -91,7 +91,7 @@ impl DMI {
 
 /// attempts to collect dmi information
 /// # Example
-/// ```
+/// ```no_run
 /// use procsys::sysfs::class_dmi;
 ///
 /// let dmi_info = class_dmi::collect().expect("dmi information");

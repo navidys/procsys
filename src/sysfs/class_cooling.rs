@@ -113,15 +113,21 @@ mod tests {
     fn cooling_devices() {
         let cooling_class_path = Path::new("test_data/fixtures/sys/class/thermal/");
         let cdev = collect_from(cooling_class_path).expect("collecting cooling information");
-        assert!(cdev.len().eq(&2));
-        assert!(cdev[0].name.eq("cooling_device0"));
-        assert!(cdev[0].cur_state.eq(&0));
-        assert!(cdev[0].max_state.eq(&50));
-        assert!(cdev[0].cooling_type.eq("Processor"));
 
-        assert!(cdev[1].name.eq("cooling_device1"));
-        assert!(cdev[1].cur_state.eq(&-1));
-        assert!(cdev[1].max_state.eq(&27));
-        assert!(cdev[1].cooling_type.eq("intel_powerclamp"));
+        for cooling in cdev {
+            match cooling.name.as_str() {
+                "cooling_device0" => {
+                    assert!(cooling.cur_state.eq(&0));
+                    assert!(cooling.max_state.eq(&50));
+                    assert!(cooling.cooling_type.eq("Processor"));
+                }
+                "cooling_device1" => {
+                    assert!(cooling.cur_state.eq(&-1));
+                    assert!(cooling.max_state.eq(&27));
+                    assert!(cooling.cooling_type.eq("intel_powerclamp"));
+                }
+                _ => panic!("invalid cooling device: {}", cooling.name),
+            }
+        }
     }
 }

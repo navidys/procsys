@@ -18,7 +18,7 @@ validate: ## Validate code
 
 .PHONY: test
 test: extract_test_data ## Run unit tests
-	sudo $(CARGO) test
+	$(CARGO) test
 
 .PHONY: create_test_data
 create_test_data: ## create test data fixtures archive
@@ -59,7 +59,7 @@ crate-publish: ## Publish crate
 
 .PHONY: clean
 clean: ## Cleanup
-	sudo rm -rf target
+	rm -rf target
 	rm -rf ./test_data/fixtures
 
 #=================================================
