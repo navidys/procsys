@@ -120,10 +120,14 @@ impl CpuInfo {
 ///
 /// ```
 pub fn collect() -> CollectResult<Vec<CpuInfo>> {
+    collect_from("/proc/cpuinfo")
+}
+
+fn collect_from(filename: &str) -> CollectResult<Vec<CpuInfo>> {
     let mut sys_cpuinfo: Vec<CpuInfo> = Vec::new();
 
     let mut info_index = 0;
-    for line in utils::read_file_lines("/proc/cpuinfo")? {
+    for line in utils::read_file_lines(filename)? {
         if line.trim().is_empty() {
             continue;
         }
@@ -365,11 +369,90 @@ mod tests {
 
     #[test]
     fn cpuinfo() {
-        let sys_cpuinfo = collect().expect("collecting cpu information");
-        assert!(!sys_cpuinfo.is_empty());
+        let sys_cpuinfo =
+            collect_from("test_data/fixtures/proc/cpuinfo").expect("collecting cpu information");
+        assert_eq!(sys_cpuinfo.len(), 2);
 
         for cpu in sys_cpuinfo {
-            assert!(cpu.processor.ge(&0));
+            match cpu.processor {
+                0 => {
+                    assert_eq!(cpu.vendor_id, "GenuineIntel");
+                    assert_eq!(cpu.cpu_family, 6);
+                    assert_eq!(cpu.model, 142);
+                    assert_eq!(cpu.model_name, "Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz");
+                    assert_eq!(cpu.stepping, 10);
+                    assert_eq!(cpu.microcode, "0xb4");
+                    assert_eq!(cpu.cpu_mhz, 799.998);
+                    assert_eq!(cpu.cache_size_bytes, 8388608);
+                    assert_eq!(cpu.physical_id, 0);
+                    assert_eq!(cpu.siblings, 8);
+                    assert_eq!(cpu.core_id, 0);
+                    assert_eq!(cpu.cpu_cores, 4);
+                    assert_eq!(cpu.apic_id, 0);
+                    assert_eq!(cpu.initial_apic_id, 0);
+                    assert_eq!(cpu.fpu, "yes");
+                    assert_eq!(cpu.fpu_exception, "yes");
+                    assert_eq!(cpu.cpu_id_level, 22);
+                    assert_eq!(cpu.wp, "yes");
+                    assert!(cpu.vmx_flags.is_empty());
+                    assert_eq!(
+                        cpu.bugs,
+                        [
+                            "cpu_meltdown",
+                            "spectre_v1",
+                            "spectre_v2",
+                            "spec_store_bypass",
+                            "l1tf",
+                            "mds",
+                            "swapgs",
+                        ]
+                    );
+                    assert_eq!(cpu.clflush_size, 64);
+                    assert_eq!(cpu.cache_alignment, 64);
+                    assert_eq!(cpu.address_sizes, "39 bits physical, 48 bits virtual");
+                    assert_eq!(cpu.bogomips, 4224.00);
+                    assert!(cpu.power_management.is_empty());
+                }
+                1 => {
+                    assert_eq!(cpu.vendor_id, "GenuineIntel");
+                    assert_eq!(cpu.cpu_family, 6);
+                    assert_eq!(cpu.model, 142);
+                    assert_eq!(cpu.model_name, "Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz");
+                    assert_eq!(cpu.stepping, 10);
+                    assert_eq!(cpu.microcode, "0xb4");
+                    assert_eq!(cpu.cpu_mhz, 800.037);
+                    assert_eq!(cpu.cache_size_bytes, 8388608);
+                    assert_eq!(cpu.physical_id, 0);
+                    assert_eq!(cpu.siblings, 8);
+                    assert_eq!(cpu.core_id, 1);
+                    assert_eq!(cpu.cpu_cores, 4);
+                    assert_eq!(cpu.apic_id, 2);
+                    assert_eq!(cpu.initial_apic_id, 2);
+                    assert_eq!(cpu.fpu, "yes");
+                    assert_eq!(cpu.fpu_exception, "yes");
+                    assert_eq!(cpu.cpu_id_level, 22);
+                    assert_eq!(cpu.wp, "yes");
+                    assert!(cpu.vmx_flags.is_empty());
+                    assert_eq!(
+                        cpu.bugs,
+                        [
+                            "cpu_meltdown",
+                            "spectre_v1",
+                            "spectre_v2",
+                            "spec_store_bypass",
+                            "l1tf",
+                            "mds",
+                            "swapgs",
+                        ]
+                    );
+                    assert_eq!(cpu.clflush_size, 64);
+                    assert_eq!(cpu.cache_alignment, 64);
+                    assert_eq!(cpu.address_sizes, "39 bits physical, 48 bits virtual");
+                    assert_eq!(cpu.bogomips, 4224.00);
+                    assert!(cpu.power_management.is_empty());
+                }
+                _ => panic!("invalid processor: {}", cpu.processor),
+            }
         }
     }
 }
