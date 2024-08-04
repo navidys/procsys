@@ -15,8 +15,19 @@ pub fn collect_info_string(filename: &str, dir_path: &Path) -> CollectResult<Opt
 
     let info_path = Path::new(dir_path).join(filename);
 
+    if !info_path.exists() {
+        return Ok(None);
+    }
+
     match fs::read_to_string(info_path.as_path()) {
-        Ok(c) => Ok(Some(c.trim().to_string())),
+        Ok(c) => {
+            let value = c.trim().to_string();
+            if value.is_empty() {
+                return Ok(None);
+            }
+
+            Ok(Some(c.trim().to_string()))
+        }
         Err(err) => Err(MetricError::IOError(info_path, err)),
     }
 }
@@ -54,7 +65,11 @@ pub fn list_dir_content(
 ) -> Vec<String> {
     let mut content = Vec::new();
 
-    for dir_item in WalkDir::new(dir_path).into_iter().filter_map(|e| e.ok()) {
+    for dir_item in WalkDir::new(dir_path)
+        .max_depth(1)
+        .into_iter()
+        .filter_map(|e| e.ok())
+    {
         if dir_item.file_name() == exclude_pattern {
             continue;
         }

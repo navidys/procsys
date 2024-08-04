@@ -64,14 +64,18 @@ impl ThermalZone {
 ///
 /// ```
 pub fn collect() -> CollectResult<Vec<ThermalZone>> {
-    let mut thermal_zone_devices = Vec::new();
     let thermal_zone_class_path = Path::new("/sys/class/thermal/");
+    collect_from(thermal_zone_class_path)
+}
 
-    for tdevice in utils::list_dir_content(thermal_zone_class_path, "thermal_zone", "thermal") {
+fn collect_from(base_path: &Path) -> CollectResult<Vec<ThermalZone>> {
+    let mut thermal_zone_devices = Vec::new();
+
+    for tdevice in utils::list_dir_content(base_path, "thermal_zone", "thermal") {
         let mut thermal_device = ThermalZone::new();
         thermal_device.name = tdevice.to_string();
 
-        let mut tdev_path = PathBuf::from(thermal_zone_class_path);
+        let mut tdev_path = PathBuf::from(base_path);
 
         tdev_path.push(&tdevice);
 
@@ -138,7 +142,22 @@ mod tests {
 
     #[test]
     fn thermal_devices() {
-        let tdev = collect().expect("collecting system thermal information");
-        assert!(!tdev.is_empty())
+        let thermal_zone_class_path = Path::new("test_data/fixtures/sys/class/thermal/");
+        let tdev =
+            collect_from(thermal_zone_class_path).expect("collecting system thermal information");
+        assert!(tdev.len().eq(&2));
+        assert!(tdev[0].name.eq("thermal_zone0"));
+        assert!(tdev[0].zone_type.eq("bcm2835_thermal"));
+        assert!(tdev[0].policy.eq("step_wise"));
+        assert!(tdev[0].mode.is_none());
+        assert!(tdev[0].temp.eq(&49925));
+        assert!(tdev[0].passive.is_none());
+
+        assert!(tdev[1].name.eq("thermal_zone1"));
+        assert!(tdev[1].zone_type.eq("acpitz"));
+        assert!(tdev[1].policy.eq("step_wise"));
+        assert!(tdev[1].mode.unwrap());
+        assert!(tdev[1].temp.eq(&-44000));
+        assert!(tdev[1].passive.unwrap().eq(&0));
     }
 }

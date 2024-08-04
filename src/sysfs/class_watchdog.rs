@@ -91,13 +91,18 @@ impl Watchdog {
 ///
 /// ```
 pub fn collect() -> CollectResult<Vec<Watchdog>> {
-    let mut devices = Vec::new();
     let watchdog_class_path = Path::new("/sys/class/watchdog/");
-    for device in utils::list_dir_content(watchdog_class_path, "", "watchdog") {
+    collect_from(watchdog_class_path)
+}
+
+fn collect_from(base_path: &Path) -> CollectResult<Vec<Watchdog>> {
+    let mut devices = Vec::new();
+
+    for device in utils::list_dir_content(base_path, "", "watchdog") {
         let mut watchdog_dev = Watchdog::new();
         watchdog_dev.name = device.to_string();
 
-        let mut wdev_path = PathBuf::from(watchdog_class_path);
+        let mut wdev_path = PathBuf::from(base_path);
         wdev_path.push(&device);
 
         for dev_info in WalkDir::new(&wdev_path).into_iter().filter_map(|e| e.ok()) {
@@ -190,7 +195,41 @@ mod tests {
 
     #[test]
     fn watchdog_devices() {
-        let wdev = collect().expect("collecting system watchdog information");
-        assert!(!wdev.is_empty());
+        let watchdog_class_path = Path::new("test_data/fixtures/sys/class/watchdog/");
+        let wdev =
+            collect_from(watchdog_class_path).expect("collecting system watchdog information");
+        assert!(wdev.len().eq(&2));
+
+        assert!(wdev[0].name.eq("watchdog0"));
+        assert!(wdev[0].boot_status.unwrap().eq(&1));
+        assert!(wdev[0].options.clone().unwrap().eq("0x8380"));
+        assert!(wdev[0].fw_version.unwrap().eq(&2));
+        assert!(wdev[0].identity.clone().unwrap().eq("Software Watchdog"));
+        assert!(wdev[0].nowayout.unwrap().eq(&0));
+        assert!(wdev[0].state.clone().unwrap().eq("active"));
+        assert!(wdev[0].status.clone().unwrap().eq("0x8000"));
+        assert!(wdev[0].timeleft.unwrap().eq(&300));
+        assert!(wdev[0].timeout.unwrap().eq(&60));
+        assert!(wdev[0].min_timeout.unwrap().eq(&120));
+        assert!(wdev[0].max_timeout.unwrap().eq(&65535));
+        assert!(wdev[0].pretimeout.unwrap().eq(&120));
+        assert!(wdev[0].pretimeout_governor.clone().unwrap().eq("noop"));
+        assert!(wdev[0].access_cs0.unwrap().eq(&0));
+
+        assert!(wdev[1].name.eq("watchdog1"));
+        assert!(wdev[1].boot_status.is_none());
+        assert!(wdev[1].options.is_none());
+        assert!(wdev[1].fw_version.is_none());
+        assert!(wdev[1].identity.is_none());
+        assert!(wdev[1].nowayout.is_none());
+        assert!(wdev[1].state.is_none());
+        assert!(wdev[1].status.is_none());
+        assert!(wdev[1].timeleft.is_none());
+        assert!(wdev[1].timeout.is_none());
+        assert!(wdev[1].min_timeout.is_none());
+        assert!(wdev[1].max_timeout.is_none());
+        assert!(wdev[1].pretimeout.is_none());
+        assert!(wdev[1].pretimeout_governor.is_none());
+        assert!(wdev[1].access_cs0.is_none());
     }
 }

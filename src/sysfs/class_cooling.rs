@@ -49,14 +49,18 @@ impl Cooling {
 ///
 /// ```
 pub fn collect() -> CollectResult<Vec<Cooling>> {
-    let mut cooling_devs = Vec::new();
     let cooling_class_path = Path::new("/sys/class/thermal/");
+    collect_from(cooling_class_path)
+}
 
-    for cdevice in utils::list_dir_content(cooling_class_path, "cooling_device", "thermal") {
+fn collect_from(base_path: &Path) -> CollectResult<Vec<Cooling>> {
+    let mut cooling_devs = Vec::new();
+
+    for cdevice in utils::list_dir_content(base_path, "cooling_device", "thermal") {
         let mut cooling_device = Cooling::new();
         cooling_device.name = cdevice.to_string();
 
-        let mut cdev_path = PathBuf::from(cooling_class_path);
+        let mut cdev_path = PathBuf::from(base_path);
 
         cdev_path.push(&cdevice);
 
@@ -107,7 +111,17 @@ mod tests {
 
     #[test]
     fn cooling_devices() {
-        let cdev = collect().expect("collecting cooling information");
-        assert!(!cdev.is_empty())
+        let cooling_class_path = Path::new("test_data/fixtures/sys/class/thermal/");
+        let cdev = collect_from(cooling_class_path).expect("collecting cooling information");
+        assert!(cdev.len().eq(&2));
+        assert!(cdev[0].name.eq("cooling_device0"));
+        assert!(cdev[0].cur_state.eq(&0));
+        assert!(cdev[0].max_state.eq(&50));
+        assert!(cdev[0].cooling_type.eq("Processor"));
+
+        assert!(cdev[1].name.eq("cooling_device1"));
+        assert!(cdev[1].cur_state.eq(&-1));
+        assert!(cdev[1].max_state.eq(&27));
+        assert!(cdev[1].cooling_type.eq("intel_powerclamp"));
     }
 }

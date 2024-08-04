@@ -58,13 +58,14 @@ impl Clocksource {
 ///
 /// ```
 pub fn collect() -> CollectResult<Vec<Clocksource>> {
-    let mut clock_sources = Vec::new();
     let clock_source_path = Path::new("/sys/devices/system/clocksource");
+    collect_from(clock_source_path)
+}
 
-    for clock_dev in WalkDir::new(clock_source_path)
-        .into_iter()
-        .filter_map(|e| e.ok())
-    {
+pub fn collect_from(base_path: &Path) -> CollectResult<Vec<Clocksource>> {
+    let mut clock_sources = Vec::new();
+
+    for clock_dev in WalkDir::new(base_path).into_iter().filter_map(|e| e.ok()) {
         if clock_dev.file_name() == "clocksource" {
             continue;
         }
@@ -87,14 +88,14 @@ pub fn collect() -> CollectResult<Vec<Clocksource>> {
         let current_clocksource = collect_clocksource_info(
             ClocksourceInfo::CurrentClockSource,
             &clocksource_name,
-            clock_source_path,
+            base_path,
         )?
         .unwrap_or_default();
 
         let available_clocksource = collect_clocksource_info(
             ClocksourceInfo::AvailableClockSource,
             &clocksource_name,
-            clock_source_path,
+            base_path,
         )?
         .unwrap_or_default()
         .split(' ')
@@ -132,14 +133,15 @@ mod tests {
 
     #[test]
     fn clocksource_collect() {
-        let clock_sources = collect().expect("collecting clock source information");
+        let clock_source_path = Path::new("test_data/fixtures/sys/devices/system/clocksource");
+        let clock_sources =
+            collect_from(clock_source_path).expect("collecting clock source information");
 
-        assert!(!clock_sources.is_empty());
-
-        for clock_src in clock_sources {
-            assert!(!clock_src.name.is_empty());
-            assert!(!clock_src.available_clocksource.is_empty());
-            assert!(!clock_src.current_clocksource.is_empty());
-        }
+        assert!(clock_sources.len().eq(&1));
+        assert!(clock_sources[0].name.eq("clocksource0"));
+        assert!(clock_sources[0]
+            .available_clocksource
+            .eq(&["tsc", "hpet", "acpi_pm"]));
+        assert!(clock_sources[0].current_clocksource.eq("tsc"));
     }
 }

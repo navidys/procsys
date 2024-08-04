@@ -1,6 +1,7 @@
 name: pr
 on:
   pull_request:
+    branches: [ "main" ]
 
 jobs:
   pre-commit:
@@ -45,9 +46,3 @@ jobs:
     steps:
         - uses: actions/checkout@v4
         - run: make validate
-
-  tests:
-    runs-on: ubuntu-latest
-    steps:
-        - uses: actions/checkout@v4
-        - run: cargo test --examples

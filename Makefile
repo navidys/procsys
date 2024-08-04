@@ -12,13 +12,22 @@ PRE_COMMIT = $(shell command -v bin/venv/bin/pre-commit ~/.local/bin/pre-commit 
 #=================================================
 
 .PHONY: validate
-validate: $(CARGO_TARGET_DIR) ## Validate code
+validate: ## Validate code
 	$(CARGO) fmt --all -- --check
 	$(CARGO) clippy -p procsys@$(CRATE_VERSION) -- -D warnings
 
 .PHONY: test
-test: $(CARGO_TARGET_DIR) ## Run unit tests
+test: extract_test_data ## Run unit tests
 	sudo $(CARGO) test
+
+.PHONY: create_test_data
+create_test_data: ## create test data fixtures archive
+	./test_data/ttar.sh -C ./test_data/ -c -f ./test_data/fixtures.ttar fixtures
+
+.PHONY: extract_test_data
+extract_test_data: ## extract test data fixtures archive
+	/bin/rm -rf ./test_data/fixtures
+	./test_data/ttar.sh -C ./test_data/ -x -f ./test_data/fixtures.ttar
 
 .PHONY: pre-commit
 pre-commit:   ## Run pre-commit
@@ -51,6 +60,7 @@ crate-publish: ## Publish crate
 .PHONY: clean
 clean: ## Cleanup
 	sudo rm -rf target
+	rm -rf ./test_data/fixtures
 
 #=================================================
 # Required tools installation tartgets

@@ -102,93 +102,97 @@ impl DMI {
 ///
 /// ```
 pub fn collect() -> CollectResult<DMI> {
+    let dmi_class_path = Path::new("/sys/class/dmi/id");
+    collect_from(dmi_class_path)
+}
+
+fn collect_from(base_path: &Path) -> CollectResult<DMI> {
     let mut dmi = DMI::new();
 
-    let dmi_class_path = Path::new("/sys/class/dmi/id");
-    if !dmi_class_path.exists() {
+    if !base_path.exists() {
         return Err(MetricError::DmiSupportError);
     }
 
-    for device in utils::list_dir_content(dmi_class_path, "", "id") {
+    for device in utils::list_dir_content(base_path, "", "id") {
         match DMIType::from(device.as_str()) {
             DMIType::BiosDate => {
-                dmi.bios_date = utils::collect_info_string(&device, dmi_class_path)?;
+                dmi.bios_date = utils::collect_info_string(&device, base_path)?;
             }
 
             DMIType::BiosRelease => {
-                dmi.bios_release = utils::collect_info_string(&device, dmi_class_path)?;
+                dmi.bios_release = utils::collect_info_string(&device, base_path)?;
             }
 
             DMIType::BiosVendor => {
-                dmi.bios_vendor = utils::collect_info_string(&device, dmi_class_path)?;
+                dmi.bios_vendor = utils::collect_info_string(&device, base_path)?;
             }
 
             DMIType::BiosVersion => {
-                dmi.bios_version = utils::collect_info_string(&device, dmi_class_path)?;
+                dmi.bios_version = utils::collect_info_string(&device, base_path)?;
             }
 
             DMIType::BoardAssetTag => {
-                dmi.board_asset_tag = utils::collect_info_string(&device, dmi_class_path)?;
+                dmi.board_asset_tag = utils::collect_info_string(&device, base_path)?;
             }
 
             DMIType::BoardName => {
-                dmi.board_name = utils::collect_info_string(&device, dmi_class_path)?;
+                dmi.board_name = utils::collect_info_string(&device, base_path)?;
             }
 
             DMIType::BoardSerial => {
-                dmi.board_serial = utils::collect_info_string(&device, dmi_class_path)?;
+                dmi.board_serial = utils::collect_info_string(&device, base_path)?;
             }
 
             DMIType::BoardVendor => {
-                dmi.board_vendor = utils::collect_info_string(&device, dmi_class_path)?;
+                dmi.board_vendor = utils::collect_info_string(&device, base_path)?;
             }
 
             DMIType::BoardVersion => {
-                dmi.board_version = utils::collect_info_string(&device, dmi_class_path)?;
+                dmi.board_version = utils::collect_info_string(&device, base_path)?;
             }
 
             DMIType::ChassisAssetTag => {
-                dmi.chassis_asset_tag = utils::collect_info_string(&device, dmi_class_path)?;
+                dmi.chassis_asset_tag = utils::collect_info_string(&device, base_path)?;
             }
 
             DMIType::ChassisSerial => {
-                dmi.chassis_serial = utils::collect_info_string(&device, dmi_class_path)?;
+                dmi.chassis_serial = utils::collect_info_string(&device, base_path)?;
             }
 
             DMIType::ChassisType => {
-                dmi.chassis_type = utils::collect_info_string(&device, dmi_class_path)?;
+                dmi.chassis_type = utils::collect_info_string(&device, base_path)?;
             }
 
             DMIType::ChassisVendor => {
-                dmi.chassis_vendor = utils::collect_info_string(&device, dmi_class_path)?;
+                dmi.chassis_vendor = utils::collect_info_string(&device, base_path)?;
             }
 
             DMIType::ChassisVersion => {
-                dmi.chassis_version = utils::collect_info_string(&device, dmi_class_path)?;
+                dmi.chassis_version = utils::collect_info_string(&device, base_path)?;
             }
 
             DMIType::ProductFamily => {
-                dmi.product_family = utils::collect_info_string(&device, dmi_class_path)?;
+                dmi.product_family = utils::collect_info_string(&device, base_path)?;
             }
 
             DMIType::ProductName => {
-                dmi.product_name = utils::collect_info_string(&device, dmi_class_path)?;
+                dmi.product_name = utils::collect_info_string(&device, base_path)?;
             }
 
             DMIType::ProductSerial => {
-                dmi.product_serial = utils::collect_info_string(&device, dmi_class_path)?;
+                dmi.product_serial = utils::collect_info_string(&device, base_path)?;
             }
 
             DMIType::ProductSku => {
-                dmi.product_sku = utils::collect_info_string(&device, dmi_class_path)?;
+                dmi.product_sku = utils::collect_info_string(&device, base_path)?;
             }
 
             DMIType::ProductUuid => {
-                dmi.product_uuid = utils::collect_info_string(&device, dmi_class_path)?;
+                dmi.product_uuid = utils::collect_info_string(&device, base_path)?;
             }
 
             DMIType::SystemVendor => {
-                dmi.system_vendor = utils::collect_info_string(&device, dmi_class_path)?;
+                dmi.system_vendor = utils::collect_info_string(&device, base_path)?;
             }
 
             DMIType::Unknown => {}
@@ -204,8 +208,39 @@ mod tests {
 
     #[test]
     fn dmi_collect() {
-        match collect() {
-            Ok(dmi_result) => assert!(dmi_result.bios_date.is_some()),
+        let dmi_class_path = Path::new("test_data/fixtures/sys/class/dmi/id");
+        match collect_from(dmi_class_path) {
+            Ok(dmi_result) => {
+                assert!(dmi_result.bios_date.unwrap().eq("04/12/2021"));
+                assert!(dmi_result.bios_release.unwrap().eq("2.2"));
+                assert!(dmi_result.bios_vendor.unwrap().eq("Dell Inc."));
+                assert!(dmi_result.bios_version.unwrap().eq("2.2.4"));
+                assert!(dmi_result.board_name.unwrap().eq("07PXPY"));
+                assert!(dmi_result
+                    .board_serial
+                    .unwrap()
+                    .eq(".7N62AI2.GRTCL6944100GP."));
+                assert!(dmi_result.board_vendor.unwrap().eq("Dell Inc."));
+                assert!(dmi_result.board_version.unwrap().eq("A01"));
+                assert!(dmi_result.chassis_asset_tag.is_none());
+                assert!(dmi_result.chassis_serial.unwrap().eq("7N62AI2"));
+                assert!(dmi_result.chassis_type.unwrap().eq("23"));
+                assert!(dmi_result.chassis_vendor.unwrap().eq("Dell Inc."));
+                assert!(dmi_result.chassis_version.is_none());
+                assert!(dmi_result.product_family.unwrap().eq("PowerEdge"));
+                assert!(dmi_result.product_name.unwrap().eq("PowerEdge R6515"));
+                assert!(dmi_result.product_serial.unwrap().eq("7N62AI2"));
+                assert!(dmi_result
+                    .product_sku
+                    .unwrap()
+                    .eq("SKU=NotProvided;ModelName=PowerEdge R6515"));
+                assert!(dmi_result
+                    .product_uuid
+                    .unwrap()
+                    .eq("83340ca8-cb49-4474-8c29-d2088ca84dd9"));
+                assert!(dmi_result.product_version.is_none());
+                assert!(dmi_result.system_vendor.unwrap().eq("Dell Inc."));
+            }
             Err(err) => {
                 if err.to_string() != MetricError::DmiSupportError.to_string() {
                     panic!("{}", err);
