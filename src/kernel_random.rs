@@ -55,25 +55,29 @@ impl KernelRandom {
 ///
 /// ```
 pub fn collect() -> CollectResult<KernelRandom> {
-    let mut krandom = KernelRandom::new();
     let krandom_dir = Path::new("/proc/sys/kernel/random");
+    collect_from(krandom_dir)
+}
 
-    for item in utils::list_dir_content(krandom_dir, "", "random") {
+fn collect_from(base_path: &Path) -> CollectResult<KernelRandom> {
+    let mut krandom = KernelRandom::new();
+
+    for item in utils::list_dir_content(base_path, "", "random") {
         match KernelRandomInfo::from(&item) {
             KernelRandomInfo::EntropyAvaliable => {
-                krandom.entropy_available = utils::collect_info_u64(&item, krandom_dir)?
+                krandom.entropy_available = utils::collect_info_u64(&item, base_path)?
             }
             KernelRandomInfo::PoolSize => {
-                krandom.pool_size = utils::collect_info_u64(&item, krandom_dir)?
+                krandom.pool_size = utils::collect_info_u64(&item, base_path)?
             }
             KernelRandomInfo::URandomMinReseedSeconds => {
-                krandom.urandom_min_reseed_secs = utils::collect_info_u64(&item, krandom_dir)?
+                krandom.urandom_min_reseed_secs = utils::collect_info_u64(&item, base_path)?
             }
             KernelRandomInfo::WriteWakeupThreshold => {
-                krandom.write_wakeup_threshold = utils::collect_info_u64(&item, krandom_dir)?
+                krandom.write_wakeup_threshold = utils::collect_info_u64(&item, base_path)?
             }
             KernelRandomInfo::ReadWakeupThreshold => {
-                krandom.read_wakeup_threshold = utils::collect_info_u64(&item, krandom_dir)?
+                krandom.read_wakeup_threshold = utils::collect_info_u64(&item, base_path)?
             }
             KernelRandomInfo::Unknown => {}
         }
@@ -88,21 +92,14 @@ mod tests {
 
     #[test]
     fn kernel_random_gen() {
-        let min_value: u64 = 0;
-        let krandom = collect().expect("collecting random number generator information");
-        assert!(krandom.entropy_available.unwrap_or_default().ge(&min_value));
-        assert!(krandom.pool_size.unwrap_or_default().ge(&min_value));
-        assert!(krandom
-            .urandom_min_reseed_secs
-            .unwrap_or_default()
-            .ge(&min_value));
-        assert!(krandom
-            .write_wakeup_threshold
-            .unwrap_or_default()
-            .ge(&min_value));
-        assert!(krandom
-            .read_wakeup_threshold
-            .unwrap_or_default()
-            .ge(&min_value));
+        let krandom_dir = Path::new("test_data/fixtures/proc/sys/kernel/random");
+        let krandom =
+            collect_from(krandom_dir).expect("collecting random number generator information");
+
+        assert_eq!(krandom.entropy_available.unwrap(), 3943);
+        assert_eq!(krandom.pool_size.unwrap(), 4096);
+        assert_eq!(krandom.urandom_min_reseed_secs.unwrap(), 60);
+        assert_eq!(krandom.write_wakeup_threshold.unwrap(), 3072);
+        assert!(krandom.read_wakeup_threshold.is_none());
     }
 }
