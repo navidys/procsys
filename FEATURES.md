@@ -1,6 +1,7 @@
 Supported Features
 * ✅ `/proc/<pid>`
     * comm
+    * exe
 
 * ✅ `/proc/buddyinfo`
 

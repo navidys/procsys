@@ -1,4 +1,7 @@
-use std::path::{Path, PathBuf};
+use std::{
+    fs::read_link,
+    path::{Path, PathBuf},
+};
 
 use serde::Serialize;
 
@@ -25,9 +28,37 @@ impl Proc {
 
     /// returns the command name of a process
     pub fn comm(&self) -> CollectResult<String> {
-        match utils::collect_info_string("comm", Path::new(&self.path)) {
+        match utils::collect_info_string("comm", &self.path) {
             Ok(c) => Ok(c.unwrap_or_default().trim().to_string()),
             Err(err) => Err(err),
+        }
+    }
+
+    /// returns the wchan (wait channel) of a process
+    pub fn wchan(&self) -> CollectResult<String> {
+        match utils::collect_info_string("wchan", &self.path) {
+            Ok(c) => {
+                let mut wchan = String::new();
+                let wchan_data = c.unwrap_or_default().trim().to_string();
+
+                if wchan_data != "0" {
+                    wchan = wchan_data;
+                }
+
+                Ok(wchan)
+            }
+            Err(err) => Err(err),
+        }
+    }
+
+    /// returns the absolute path of the executable command of a process
+    pub fn executable(&self) -> CollectResult<PathBuf> {
+        let mut proc_path = self.path.clone();
+        proc_path.push("exe");
+
+        match read_link(&proc_path) {
+            Ok(c) => Ok(c),
+            Err(err) => Err(MetricError::IOError(proc_path, err)),
         }
     }
 }
