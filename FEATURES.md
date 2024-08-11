@@ -1,4 +1,7 @@
 Supported Features
+* ✅ `/proc/<pid>`
+    * comm
+
 * ✅ `/proc/buddyinfo`
 
 * ✅ `/proc/cmdline`

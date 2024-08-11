@@ -29,6 +29,9 @@ pub enum MetricError {
 
     /// Invalid fields number
     InvalidFieldNumberError(String, usize, String),
+
+    /// Process not found
+    ProcessNotFound(usize),
 }
 
 impl fmt::Display for MetricError {
@@ -48,6 +51,7 @@ impl fmt::Display for MetricError {
             MetricError::ParseFloatError(ref item, ref e) => {
                 write!(f, "{} parse {} float error", item, e)
             }
+            MetricError::ProcessNotFound(ref pid) => write!(f, "process (pid={}) not found", pid),
             MetricError::ByteConvertError(ref unit) => write!(f, "invalid unit: {}", unit),
             MetricError::InvalidFieldNumberError(ref title, ref num, ref fields) => {
                 write!(f, "invalid {} fields number {}: {:?}", title, num, fields)
