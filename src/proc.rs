@@ -91,8 +91,14 @@ impl Proc {
 /// use procsys::proc;
 ///
 /// let procs = proc::collect_all().expect("system processes");
-/// let json_output = serde_json::to_string_pretty(&procs).unwrap();
-/// println!("{}", json_output);
+/// for proc in procs {
+///     println!("pid: {}", proc.pid());
+///     println!("\t comm: {}", proc.comm().unwrap_or_default());
+///     println!("\t wchan: {}", proc.wchan().unwrap_or_default());
+///     println!("\t executable: {:?}", proc.executable().unwrap_or_default());
+///     println!("\t cwd: {:?}", proc.cwd().unwrap_or_default());
+///     println!("\t root: {:?}", proc.root_dir().unwrap_or_default());
+/// }
 ///
 /// ```
 pub fn collect_all() -> CollectResult<Vec<Proc>> {
