@@ -61,6 +61,28 @@ impl Proc {
             Err(err) => Err(MetricError::IOError(proc_path, err)),
         }
     }
+
+    /// returns the absolute path to the current working directory of the process
+    pub fn cwd(&self) -> CollectResult<PathBuf> {
+        let mut proc_path = self.path.clone();
+        proc_path.push("cwd");
+
+        match read_link(&proc_path) {
+            Ok(c) => Ok(c),
+            Err(err) => Err(MetricError::IOError(proc_path, err)),
+        }
+    }
+
+    /// returns the absolute path to the process's root directory (as set by chroot)
+    pub fn root_dir(&self) -> CollectResult<PathBuf> {
+        let mut proc_path = self.path.clone();
+        proc_path.push("root");
+
+        match read_link(&proc_path) {
+            Ok(c) => Ok(c),
+            Err(err) => Err(MetricError::IOError(proc_path, err)),
+        }
+    }
 }
 
 /// Collects all available processes running on system.
