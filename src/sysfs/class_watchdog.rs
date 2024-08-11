@@ -200,36 +200,42 @@ mod tests {
             collect_from(watchdog_class_path).expect("collecting system watchdog information");
         assert!(wdev.len().eq(&2));
 
-        assert!(wdev[0].name.eq("watchdog0"));
-        assert!(wdev[0].boot_status.unwrap().eq(&1));
-        assert!(wdev[0].options.clone().unwrap().eq("0x8380"));
-        assert!(wdev[0].fw_version.unwrap().eq(&2));
-        assert!(wdev[0].identity.clone().unwrap().eq("Software Watchdog"));
-        assert!(wdev[0].nowayout.unwrap().eq(&0));
-        assert!(wdev[0].state.clone().unwrap().eq("active"));
-        assert!(wdev[0].status.clone().unwrap().eq("0x8000"));
-        assert!(wdev[0].timeleft.unwrap().eq(&300));
-        assert!(wdev[0].timeout.unwrap().eq(&60));
-        assert!(wdev[0].min_timeout.unwrap().eq(&120));
-        assert!(wdev[0].max_timeout.unwrap().eq(&65535));
-        assert!(wdev[0].pretimeout.unwrap().eq(&120));
-        assert!(wdev[0].pretimeout_governor.clone().unwrap().eq("noop"));
-        assert!(wdev[0].access_cs0.unwrap().eq(&0));
-
-        assert!(wdev[1].name.eq("watchdog1"));
-        assert!(wdev[1].boot_status.is_none());
-        assert!(wdev[1].options.is_none());
-        assert!(wdev[1].fw_version.is_none());
-        assert!(wdev[1].identity.is_none());
-        assert!(wdev[1].nowayout.is_none());
-        assert!(wdev[1].state.is_none());
-        assert!(wdev[1].status.is_none());
-        assert!(wdev[1].timeleft.is_none());
-        assert!(wdev[1].timeout.is_none());
-        assert!(wdev[1].min_timeout.is_none());
-        assert!(wdev[1].max_timeout.is_none());
-        assert!(wdev[1].pretimeout.is_none());
-        assert!(wdev[1].pretimeout_governor.is_none());
-        assert!(wdev[1].access_cs0.is_none());
+        for wd in wdev {
+            match wd.name.as_str() {
+                "watchdog0" => {
+                    assert!(wd.boot_status.unwrap().eq(&1));
+                    assert!(wd.options.clone().unwrap().eq("0x8380"));
+                    assert!(wd.fw_version.unwrap().eq(&2));
+                    assert!(wd.identity.clone().unwrap().eq("Software Watchdog"));
+                    assert!(wd.nowayout.unwrap().eq(&0));
+                    assert!(wd.state.clone().unwrap().eq("active"));
+                    assert!(wd.status.clone().unwrap().eq("0x8000"));
+                    assert!(wd.timeleft.unwrap().eq(&300));
+                    assert!(wd.timeout.unwrap().eq(&60));
+                    assert!(wd.min_timeout.unwrap().eq(&120));
+                    assert!(wd.max_timeout.unwrap().eq(&65535));
+                    assert!(wd.pretimeout.unwrap().eq(&120));
+                    assert!(wd.pretimeout_governor.clone().unwrap().eq("noop"));
+                    assert!(wd.access_cs0.unwrap().eq(&0));
+                }
+                "watchdog1" => {
+                    assert!(wd.boot_status.is_none());
+                    assert!(wd.options.is_none());
+                    assert!(wd.fw_version.is_none());
+                    assert!(wd.identity.is_none());
+                    assert!(wd.nowayout.is_none());
+                    assert!(wd.state.is_none());
+                    assert!(wd.status.is_none());
+                    assert!(wd.timeleft.is_none());
+                    assert!(wd.timeout.is_none());
+                    assert!(wd.min_timeout.is_none());
+                    assert!(wd.max_timeout.is_none());
+                    assert!(wd.pretimeout.is_none());
+                    assert!(wd.pretimeout_governor.is_none());
+                    assert!(wd.access_cs0.is_none());
+                }
+                _ => panic!("invalid watchdog device: {}", wd.name),
+            }
+        }
     }
 }
