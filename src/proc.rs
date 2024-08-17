@@ -51,6 +51,23 @@ impl Proc {
         }
     }
 
+    /// returns the command line of a process
+    pub fn cmdline(&self) -> CollectResult<Vec<String>> {
+        match utils::collect_info_string("cmdline", &self.path) {
+            Ok(c) => {
+                let proc_cmdline = c
+                    .unwrap_or_default()
+                    .trim_end_matches("\x00")
+                    .split("\x00")
+                    .map(|v| v.to_string())
+                    .collect::<Vec<String>>();
+
+                Ok(proc_cmdline)
+            }
+            Err(err) => Err(err),
+        }
+    }
+
     /// returns the absolute path of the executable command of a process
     pub fn executable(&self) -> CollectResult<PathBuf> {
         let mut proc_path = self.path.clone();
@@ -194,6 +211,7 @@ mod tests {
             PathBuf::from("/usr/bin/vim"),
         );
         assert_eq!(sys_single_proc.root_dir().unwrap(), PathBuf::from("/"));
+        assert_eq!(sys_single_proc.cmdline().unwrap(), ["vim", "test.go", "+10"] );
 
         let sys_single_proc = collect_from(proc_path, 26232).expect("running proc 26232");
         assert_eq!(sys_single_proc.cwd().is_err(), true);

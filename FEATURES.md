@@ -3,6 +3,7 @@ Supported Features
     * comm
     * exe
     * cwd
+    * cmdline
     * root
 
 * ✅ `/proc/buddyinfo`
