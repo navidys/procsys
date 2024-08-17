@@ -12,12 +12,12 @@ use crate::{
 
 /// Proc represent a single process
 #[derive(Debug, Serialize)]
-pub struct Proc {
+pub struct Process {
     id: usize,
     path: PathBuf,
 }
 
-impl Proc {
+impl Process {
     fn new(id: usize, path: PathBuf) -> Self {
         Self { id, path }
     }
@@ -144,9 +144,9 @@ impl Proc {
 /// Collects all available processes running on system.
 /// # Example
 /// ```
-/// use procsys::proc;
+/// use procsys::process;
 ///
-/// let procs = proc::collect_all().expect("system processes");
+/// let procs = process::collect_all().expect("system processes");
 /// for proc in procs {
 ///     println!("pid: {}", proc.pid());
 ///     println!("\t comm: {}", proc.comm().unwrap_or_default());
@@ -157,7 +157,7 @@ impl Proc {
 /// }
 ///
 /// ```
-pub fn collect_all() -> CollectResult<Vec<Proc>> {
+pub fn collect_all() -> CollectResult<Vec<Process>> {
     let proc_path = Path::new("/proc");
     collect_all_from(proc_path)
 }
@@ -165,19 +165,19 @@ pub fn collect_all() -> CollectResult<Vec<Proc>> {
 /// collect and return a specific process
 /// # Example
 /// ```
-/// use procsys::proc;
+/// use procsys::process;
 ///
-/// let proc = proc::collect(1).expect("process pid 1");
+/// let proc = process::collect(1).expect("process pid 1");
 /// println!("pid: {}", proc.pid());
 /// println!("\t comm: {}", proc.comm().unwrap_or_default());
 ///
 /// ```
-pub fn collect(pid: usize) -> CollectResult<Proc> {
+pub fn collect(pid: usize) -> CollectResult<Process> {
     let proc_path = Path::new("/proc");
     collect_from(proc_path, pid)
 }
 
-fn collect_all_from(base_path: &Path) -> CollectResult<Vec<Proc>> {
+fn collect_all_from(base_path: &Path) -> CollectResult<Vec<Process>> {
     let mut sysprocs = Vec::new();
 
     for file_info in utils::list_dir_content(base_path, "", "proc") {
@@ -186,7 +186,7 @@ fn collect_all_from(base_path: &Path) -> CollectResult<Vec<Proc>> {
             proc_dir_path.push(format!("{}", pid));
 
             if proc_dir_path.as_path().is_dir() {
-                sysprocs.push(Proc::new(pid, proc_dir_path));
+                sysprocs.push(Process::new(pid, proc_dir_path));
             }
         }
     }
@@ -194,12 +194,12 @@ fn collect_all_from(base_path: &Path) -> CollectResult<Vec<Proc>> {
     Ok(sysprocs)
 }
 
-pub fn collect_from(base_path: &Path, pid: usize) -> CollectResult<Proc> {
+pub fn collect_from(base_path: &Path, pid: usize) -> CollectResult<Process> {
     let mut proc_dir_path = PathBuf::from(base_path);
     proc_dir_path.push(format!("{}", pid));
 
     if proc_dir_path.as_path().is_dir() {
-        return Ok(Proc::new(pid, proc_dir_path));
+        return Ok(Process::new(pid, proc_dir_path));
     }
 
     Err(MetricError::ProcessNotFound(pid))

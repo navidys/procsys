@@ -2,11 +2,11 @@ use serde::Serialize;
 
 use crate::{
     error::{CollectResult, MetricError},
-    proc::Proc,
+    process::Process,
     utils,
 };
 
-enum ProcIOType {
+enum ProcessIOType {
     RChar,
     WChar,
     SyscR,
@@ -17,24 +17,24 @@ enum ProcIOType {
     Unknown,
 }
 
-impl ProcIOType {
-    fn from(name: &str) -> ProcIOType {
+impl ProcessIOType {
+    fn from(name: &str) -> ProcessIOType {
         match name {
-            "rchar" => ProcIOType::RChar,
-            "wchar" => ProcIOType::WChar,
-            "syscr" => ProcIOType::SyscR,
-            "syscw" => ProcIOType::SyscW,
-            "read_bytes" => ProcIOType::ReadBytes,
-            "write_bytes" => ProcIOType::WriteBytes,
-            "cancelled_write_bytes" => ProcIOType::CancelledWriteBytes,
-            _ => ProcIOType::Unknown,
+            "rchar" => ProcessIOType::RChar,
+            "wchar" => ProcessIOType::WChar,
+            "syscr" => ProcessIOType::SyscR,
+            "syscw" => ProcessIOType::SyscW,
+            "read_bytes" => ProcessIOType::ReadBytes,
+            "write_bytes" => ProcessIOType::WriteBytes,
+            "cancelled_write_bytes" => ProcessIOType::CancelledWriteBytes,
+            _ => ProcessIOType::Unknown,
         }
     }
 }
 
 /// ProcIO models the content of /proc/\<pid\>/io
 #[derive(Debug, Serialize, Clone, Default)]
-pub struct ProcIO {
+pub struct ProcessIO {
     pub rchar: u64,
     pub wchar: u64,
     pub syscr: u64,
@@ -44,16 +44,16 @@ pub struct ProcIO {
     pub cancelled_write_bytes: i64,
 }
 
-impl ProcIO {
+impl ProcessIO {
     fn new() -> Self {
         Default::default()
     }
 }
 
-impl Proc {
+impl Process {
     /// returns proc IO stats
-    pub fn io(&self) -> CollectResult<ProcIO> {
-        let mut proc_io = ProcIO::new();
+    pub fn io(&self) -> CollectResult<ProcessIO> {
+        let mut proc_io = ProcessIO::new();
         let proc_io_path_str = format!("{:?}", self.path());
         let proc_io_file = format!("{}/io", proc_io_path_str.replace("\"", ""));
         for line in utils::read_file_lines(&proc_io_file)? {
@@ -68,21 +68,29 @@ impl Proc {
             }
 
             let item_value = item_fields[1].trim();
-            match ProcIOType::from(item_fields[0]) {
-                ProcIOType::RChar => proc_io.rchar = item_value.parse::<u64>().unwrap_or_default(),
-                ProcIOType::WChar => proc_io.wchar = item_value.parse::<u64>().unwrap_or_default(),
-                ProcIOType::SyscR => proc_io.syscr = item_value.parse::<u64>().unwrap_or_default(),
-                ProcIOType::SyscW => proc_io.syscw = item_value.parse::<u64>().unwrap_or_default(),
-                ProcIOType::ReadBytes => {
+            match ProcessIOType::from(item_fields[0]) {
+                ProcessIOType::RChar => {
+                    proc_io.rchar = item_value.parse::<u64>().unwrap_or_default()
+                }
+                ProcessIOType::WChar => {
+                    proc_io.wchar = item_value.parse::<u64>().unwrap_or_default()
+                }
+                ProcessIOType::SyscR => {
+                    proc_io.syscr = item_value.parse::<u64>().unwrap_or_default()
+                }
+                ProcessIOType::SyscW => {
+                    proc_io.syscw = item_value.parse::<u64>().unwrap_or_default()
+                }
+                ProcessIOType::ReadBytes => {
                     proc_io.read_bytes = item_value.parse::<u64>().unwrap_or_default()
                 }
-                ProcIOType::WriteBytes => {
+                ProcessIOType::WriteBytes => {
                     proc_io.write_bytes = item_value.parse::<u64>().unwrap_or_default()
                 }
-                ProcIOType::CancelledWriteBytes => {
+                ProcessIOType::CancelledWriteBytes => {
                     proc_io.cancelled_write_bytes = item_value.parse::<i64>().unwrap_or_default()
                 }
-                ProcIOType::Unknown => {}
+                ProcessIOType::Unknown => {}
             }
         }
 
@@ -94,7 +102,7 @@ impl Proc {
 mod tests {
     use std::path::Path;
 
-    use crate::proc::*;
+    use crate::process::*;
 
     #[test]
     fn proc_io() {
