@@ -26,6 +26,10 @@ impl Proc {
         self.id
     }
 
+    pub fn path(&self) -> PathBuf {
+        self.path.clone()
+    }
+
     /// returns the command name of a process
     pub fn comm(&self) -> CollectResult<String> {
         match utils::collect_info_string("comm", &self.path) {

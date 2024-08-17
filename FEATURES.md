@@ -1,10 +1,11 @@
 Supported Features
 * ✅ `/proc/<pid>`
-    * comm
-    * exe
-    * environ
-    * cwd
     * cmdline
+    * comm
+    * cwd
+    * environ
+    * exe
+    * io
     * root
 
 * ✅ `/proc/buddyinfo`
