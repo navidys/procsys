@@ -1,7 +1,7 @@
-use procsys::proc;
+use procsys::process;
 
 fn main() {
-    let procs = proc::collect_all().expect("system processes");
+    let procs = process::collect_all().expect("system processes");
 
     for proc in procs {
         println!("pid: {}", proc.pid());
