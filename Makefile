@@ -40,7 +40,7 @@ endif
 .PHONY: codespell
 codespell: ## Run codespell
 	@echo "running codespell"
-	@codespell -S ./target,./targets -L crate
+	@codespell -S ./target,./targets,./test_data -L crate
 
 #=================================================
 # Publish crate

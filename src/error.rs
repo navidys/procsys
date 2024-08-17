@@ -32,6 +32,9 @@ pub enum MetricError {
 
     /// Process not found
     ProcessNotFound(usize),
+
+    /// Path not found
+    PathNotFound(PathBuf),
 }
 
 impl fmt::Display for MetricError {
@@ -52,6 +55,7 @@ impl fmt::Display for MetricError {
                 write!(f, "{} parse {} float error", item, e)
             }
             MetricError::ProcessNotFound(ref pid) => write!(f, "process (pid={}) not found", pid),
+            MetricError::PathNotFound(ref p) => write!(f, "path ({:?}) not found", p),
             MetricError::ByteConvertError(ref unit) => write!(f, "invalid unit: {}", unit),
             MetricError::InvalidFieldNumberError(ref title, ref num, ref fields) => {
                 write!(f, "invalid {} fields number {}: {:?}", title, num, fields)
