@@ -2,6 +2,7 @@ Supported Features
 * ✅ `/proc/<pid>`
     * comm
     * exe
+    * environ
     * cwd
     * cmdline
     * root
