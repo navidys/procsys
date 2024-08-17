@@ -57,7 +57,13 @@ impl Proc {
         proc_path.push("exe");
 
         match read_link(&proc_path) {
-            Ok(c) => Ok(c),
+            Ok(c) => {
+                if c.exists() {
+                    return Ok(c);
+                }
+
+                Err(MetricError::PathNotFound(c))
+            }
             Err(err) => Err(MetricError::IOError(proc_path, err)),
         }
     }
@@ -68,7 +74,13 @@ impl Proc {
         proc_path.push("cwd");
 
         match read_link(&proc_path) {
-            Ok(c) => Ok(c),
+            Ok(c) => {
+                if c.exists() {
+                    return Ok(c);
+                }
+
+                Err(MetricError::PathNotFound(c))
+            }
             Err(err) => Err(MetricError::IOError(proc_path, err)),
         }
     }
@@ -79,7 +91,13 @@ impl Proc {
         proc_path.push("root");
 
         match read_link(&proc_path) {
-            Ok(c) => Ok(c),
+            Ok(c) => {
+                if c.exists() {
+                    return Ok(c);
+                }
+
+                Err(MetricError::PathNotFound(c))
+            }
             Err(err) => Err(MetricError::IOError(proc_path, err)),
         }
     }
@@ -103,7 +121,7 @@ impl Proc {
 /// ```
 pub fn collect_all() -> CollectResult<Vec<Proc>> {
     let proc_path = Path::new("/proc");
-    collect_from(proc_path)
+    collect_all_from(proc_path)
 }
 
 /// collect and return a specific process
@@ -117,23 +135,17 @@ pub fn collect_all() -> CollectResult<Vec<Proc>> {
 ///
 /// ```
 pub fn collect(pid: usize) -> CollectResult<Proc> {
-    let proc_path = format!("/proc/{}/", pid);
-    let proc_dir_path = PathBuf::from(proc_path);
-
-    if proc_dir_path.as_path().is_dir() {
-        return Ok(Proc::new(pid, proc_dir_path));
-    }
-
-    Err(MetricError::ProcessNotFound(pid))
+    let proc_path = Path::new("/proc");
+    collect_from(proc_path, pid)
 }
 
-fn collect_from(base_path: &Path) -> CollectResult<Vec<Proc>> {
+fn collect_all_from(base_path: &Path) -> CollectResult<Vec<Proc>> {
     let mut sysprocs = Vec::new();
 
     for file_info in utils::list_dir_content(base_path, "", "proc") {
         if let Ok(pid) = file_info.parse::<usize>() {
-            let proc_path = format!("/proc/{}/", pid);
-            let proc_dir_path = PathBuf::from(proc_path);
+            let mut proc_dir_path = PathBuf::from(base_path);
+            proc_dir_path.push(format!("{}", pid));
 
             if proc_dir_path.as_path().is_dir() {
                 sysprocs.push(Proc::new(pid, proc_dir_path));
@@ -142,4 +154,49 @@ fn collect_from(base_path: &Path) -> CollectResult<Vec<Proc>> {
     }
 
     Ok(sysprocs)
+}
+
+pub fn collect_from(base_path: &Path, pid: usize) -> CollectResult<Proc> {
+    let mut proc_dir_path = PathBuf::from(base_path);
+    proc_dir_path.push(format!("{}", pid));
+
+    if proc_dir_path.as_path().is_dir() {
+        return Ok(Proc::new(pid, proc_dir_path));
+    }
+
+    Err(MetricError::ProcessNotFound(pid))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn proc_collect_all() {
+        let sysprocs =
+            collect_all_from(Path::new("test_data/fixtures/proc")).expect("running procs");
+        assert_eq!(sysprocs.len(), 7);
+    }
+
+    #[test]
+    fn proc_collect() {
+        let proc_path = Path::new("test_data/fixtures/proc");
+
+        let sys_single_proc = collect_from(proc_path, 2);
+        assert_eq!(sys_single_proc.is_err(), true);
+
+        let sys_single_proc = collect_from(proc_path, 26231).expect("running proc 26231");
+        assert_eq!(sys_single_proc.cwd().unwrap(), PathBuf::from("/usr/bin/"));
+        assert_eq!(sys_single_proc.comm().unwrap(), "vim");
+        assert_eq!(sys_single_proc.wchan().unwrap(), "poll_schedule_timeout");
+        assert_eq!(
+            sys_single_proc.executable().unwrap(),
+            PathBuf::from("/usr/bin/vim"),
+        );
+        assert_eq!(sys_single_proc.root_dir().unwrap(), PathBuf::from("/"));
+
+        let sys_single_proc = collect_from(proc_path, 26232).expect("running proc 26232");
+        assert_eq!(sys_single_proc.cwd().is_err(), true);
+        assert_eq!(sys_single_proc.root_dir().is_err(), true);
+    }
 }
