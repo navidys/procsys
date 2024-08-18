@@ -8,6 +8,11 @@ Mode: 755
 Directory: fixtures/proc/26231
 Mode: 755
 # ttar - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Path: fixtures/proc/26231/cgroup
+Lines: 1
+1::/user.slice/user-1000.slice/user@1000.service/app.slice/app-org.gnome.Terminal.slice/vte-spawn-fd5b6c83-c316-470a-9732-4db75febce50.scope
+Mode: 644
+# ttar - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Path: fixtures/proc/26231/cmdline
 Lines: 1
 vimNULLBYTEtest.goNULLBYTE+10NULLBYTEEOF
