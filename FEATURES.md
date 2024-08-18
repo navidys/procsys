@@ -6,6 +6,7 @@ Supported Features
     * environ
     * exe
     * io
+    * limits
     * root
 
 * ✅ `/proc/buddyinfo`
