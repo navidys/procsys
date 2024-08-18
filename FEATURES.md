@@ -1,5 +1,6 @@
 Supported Features
 * ✅ `/proc/<pid>`
+    * cgroup
     * cmdline
     * comm
     * cwd
