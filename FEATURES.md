@@ -9,6 +9,7 @@ Supported Features
     * io
     * limits
     * root
+    * ns
 
 * ✅ `/proc/buddyinfo`
 
