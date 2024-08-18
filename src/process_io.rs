@@ -32,7 +32,7 @@ impl ProcessIOType {
     }
 }
 
-/// ProcIO models the content of /proc/\<pid\>/io
+/// ProcessIO models the content of /proc/\<pid\>/io
 #[derive(Debug, Serialize, Clone, Default)]
 pub struct ProcessIO {
     pub rchar: u64,
@@ -61,7 +61,7 @@ impl Process {
 
             if item_fields.len() != 2 {
                 return Err(MetricError::InvalidFieldNumberError(
-                    "proc io".to_string(),
+                    "process io".to_string(),
                     item_fields.len(),
                     line,
                 ));
