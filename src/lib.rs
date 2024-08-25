@@ -14,6 +14,7 @@ pub mod process_cgroup;
 pub mod process_io;
 pub mod process_limits;
 pub mod process_net_snmp;
+pub mod process_net_snmp6;
 pub mod process_netstat;
 pub mod process_ns;
 pub mod swaps;
