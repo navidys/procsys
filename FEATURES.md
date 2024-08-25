@@ -13,6 +13,7 @@ Supported Features
     * net/
         * netstat
         * snmp
+        * snmp6
 
 * ✅ `/proc/buddyinfo`
 
