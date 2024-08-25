@@ -118,3 +118,10 @@ pub fn convert_to_bytes(num: u64, unit: &str) -> CollectResult<Option<u64>> {
         _ => Err(MetricError::ByteConvertError(unit.to_string())),
     }
 }
+
+pub fn convert_str_to_i64(value: &str) -> CollectResult<i64> {
+    match value.parse::<i64>() {
+        Ok(c) => Ok(c),
+        Err(err) => Err(MetricError::ParseIntError(value.to_string(), err)),
+    }
+}
