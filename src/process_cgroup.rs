@@ -6,7 +6,7 @@ use crate::{
     utils,
 };
 
-/// ProcessCgroup models one line from /proc/[pid]/cgroup
+/// ProcessCgroup models one line from /proc/\[pid\]/cgroup
 #[derive(Debug, Serialize, Clone, Default)]
 pub struct ProcessCgroup {
     pub hierarchy_id: usize,
@@ -21,7 +21,7 @@ impl ProcessCgroup {
 }
 
 impl Process {
-    /// cgroup reads from /proc/<pid>/cgroup and returns cgroup information of the process
+    /// cgroup reads from /proc/\<pid\>/cgroup and returns cgroup information of the process
     pub fn cgroup(&self) -> CollectResult<Vec<ProcessCgroup>> {
         let mut proc_cgroups = Vec::new();
         let proc_cgroup_path_str = format!("{:?}", self.path());

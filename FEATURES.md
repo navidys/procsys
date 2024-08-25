@@ -12,6 +12,7 @@ Supported Features
     * ns
     * net/
         * netstat
+        * snmp
 
 * ✅ `/proc/buddyinfo`
 
