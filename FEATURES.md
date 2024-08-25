@@ -10,6 +10,8 @@ Supported Features
     * limits
     * root
     * ns
+    * net/
+        * netstat
 
 * ✅ `/proc/buddyinfo`
 
