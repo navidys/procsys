@@ -17,6 +17,7 @@ pub mod process_net_snmp;
 pub mod process_net_snmp6;
 pub mod process_netstat;
 pub mod process_ns;
+pub mod softirqs;
 pub mod swaps;
 pub mod sysfs;
 pub mod utils;

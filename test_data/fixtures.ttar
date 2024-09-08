@@ -1065,6 +1065,21 @@ TCP       1984  93064  1225378   yes     320   yes  kernel      y  y  y  y  y  y
 NETLINK   1040     16      -1   NI       0   no   kernel      n  n  n  n  n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
 Mode: 444
 # ttar - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Path: fixtures/proc/softirqs
+Lines: 11
+                    CPU0       CPU1
+          HI:          3          0
+       TIMER:    2776180     247490
+      NET_TX:       2419        772
+      NET_RX:      55919      28694
+       BLOCK:     174915     262755
+    IRQ_POLL:          0          0
+     TASKLET:        209         75
+       SCHED:    2278692     815209
+     HRTIMER:       1281        220
+         RCU:     605871     532783
+Mode: 444
+# ttar - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Path: fixtures/proc/swaps
 Lines: 3
 Filename				Type		Size	Used	Priority

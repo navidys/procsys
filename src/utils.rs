@@ -125,3 +125,10 @@ pub fn convert_str_to_i64(value: &str) -> CollectResult<i64> {
         Err(err) => Err(MetricError::ParseIntError(value.to_string(), err)),
     }
 }
+
+pub fn convert_str_to_u64(value: &str) -> CollectResult<u64> {
+    match value.parse::<u64>() {
+        Ok(c) => Ok(c),
+        Err(err) => Err(MetricError::ParseIntError(value.to_string(), err)),
+    }
+}
