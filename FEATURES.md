@@ -36,6 +36,8 @@ Supported Features
     * write_wakeup_threshold
     * read_wakeup_threshold
 
+* ✅ `/proc/softirqs`
+
 * ✅ `/proc/swaps`
 
 * ✅ `/sys/class/dmi/id`
