@@ -10,10 +10,11 @@ Supported Features
     * limits
     * root
     * ns
-    * net/
-        * netstat
-        * snmp
-        * snmp6
+
+* ✅ `/proc/<pid>/net`
+    * netstat
+    * snmp
+    * snmp6
 
 * ✅ `/proc/buddyinfo`
 
@@ -25,9 +26,9 @@ Supported Features
 
 * ✅ `/proc/meminfo`
 
-* ✅ `/proc/net/dev`
-
-* ✅ `/proc/net/protocols`
+* ✅ `/proc/net/`
+    * dev
+    * protocols
 
 * ✅ `/proc/sys/kernel/random`
     * entropy_avail
@@ -61,19 +62,90 @@ Supported Features
     * product_uuid
     * sys_vendor
 
-* ✅ `/sys/thermal/cooling_device<X>`
+* ✅ `/sys/class/power_supply/<NAME>`
+    * authentic
+    * calibrate
+    * capacity
+    * capacity_alert_max
+    * capacity_alert_min
+    * capacity_level
+    * charge_avg
+    * charge_control_limit
+    * charge_control_limit_max
+    * charge_counter
+    * charge_empty
+    * charge_empty_design
+    * charge_start_threshold
+    * charge_stop_threshold
+    * charge_full
+    * charge_full_design
+    * charge_now
+    * charge_term_current
+    * charge_type
+    * constant_charge_current
+    * constant_charge_current_max
+    * constant_charge_voltage
+    * constant_charge_voltage_max
+    * current_avg
+    * current_boot
+    * current_max
+    * current_now
+    * cycle_count
+    * energy_avg
+    * energy_empty
+    * energy_empty_design
+    * energy_full
+    * energy_full_design
+    * energy_now
+    * health
+    * input_current_limit
+    * manufacturer
+    * model_name
+    * online
+    * power_avg
+    * power_now
+    * precharge_current
+    * present
+    * scope
+    * serial_number
+    * status
+    * technology
+    * temp
+    * temp_alert_max
+    * temp_alert_min
+    * temp_ambient
+    * temp_ambient_max
+    * temp_ambient_min
+    * temp_max
+    * temp_min
+    * time_to_empty_avg
+    * time_to_empty_now
+    * time_to_full_avg
+    * time_to_full_now
+    * type
+    * usb_type
+    * voltage_avg
+    * voltage_boot
+    * voltage_max
+    * voltage_max_design
+    * voltage_min
+    * voltage_min_design
+    * voltage_now
+    * voltage_ocv
+
+* ✅ `/sys/class/thermal/cooling_device<X>`
     * type
     * max_state
     * cur_state
 
-* ✅ `/sys/thermal/thermal_zone<X>`
+* ✅ `/sys/class/thermal/thermal_zone<X>`
     * type
     * temp
     * policy
     * mode
     * passive
 
-* ✅ `/sys/watchdog/<name>`
+* ✅ `/sys/class/watchdog/<name>`
     * bootstatus
     * options
     * fw_version
