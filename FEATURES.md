@@ -62,6 +62,12 @@ Supported Features
     * product_uuid
     * sys_vendor
 
+* ✅ `/sys/class/nvme/<NAME>`
+    * serial
+    * model
+    * state
+    * firmware_rev
+
 * ✅ `/sys/class/power_supply/<NAME>`
     * authentic
     * calibrate

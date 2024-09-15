@@ -1267,6 +1267,32 @@ Lines: 1
 MODALIAS=dmi:bvnDellInc.:bvr2.2.4:bd04/12/2021:br2.2:svnDellInc.:pnPowerEdgeR6515:pvr:rvnDellInc.:rn07PXPY:rvrA01:cvnDellInc.:ct23:cvr:
 Mode: 644
 # ttar - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Directory: fixtures/sys/class/nvme
+Mode: 755
+# ttar - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Directory: fixtures/sys/class/nvme/nvme0
+Mode: 755
+# ttar - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Path: fixtures/sys/class/nvme/nvme0/firmware_rev
+Lines: 1
+1B2QEXP7
+Mode: 644
+# ttar - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Path: fixtures/sys/class/nvme/nvme0/model
+Lines: 1
+Samsung SSD 970 PRO 512GB
+Mode: 644
+# ttar - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Path: fixtures/sys/class/nvme/nvme0/serial
+Lines: 1
+S680HF8N190894I
+Mode: 644
+# ttar - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Path: fixtures/sys/class/nvme/nvme0/state
+Lines: 1
+live
+Mode: 644
+# ttar - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Directory: fixtures/sys/class/power_supply
 Mode: 755
 # ttar - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
