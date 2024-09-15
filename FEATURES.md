@@ -133,6 +133,18 @@ Supported Features
     * voltage_now
     * voltage_ocv
 
+* ✅ `/sys/class/scsi_tape/<NAME>/statistics`
+    * write_ns
+    * read_byte_cnt
+    * io_ns
+    * write_cnt
+    * resid_cnt
+    * read_ns
+    * in_flight
+    * other_cnt
+    * read_cnt
+    * write_byte_cnt
+
 * ✅ `/sys/class/thermal/cooling_device<X>`
     * type
     * max_state
