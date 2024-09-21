@@ -62,6 +62,34 @@ Supported Features
     * product_uuid
     * sys_vendor
 
+* ✅ `/sys/class/fc_host/<NAME>`
+    * speed
+    * port_state
+    * port_type
+    * symbolic_name
+    * node_name
+    * port_id
+    * port_name
+    * fabric_name
+    * dev_loss_tmo
+    * supported_classes
+    * supported_speeds
+    * statistics/
+        * dumped_frames
+        * error_frames
+        * invalid_crc_count
+        * rx_frames
+        * rx_words
+        * tx_frames
+        * tx_words
+        * seconds_since_last_reset
+        * invalid_tx_word_count
+        * link_failure_count
+        * loss_of_sync_count
+        * loss_of_signal_count
+        * nos_count
+        * fcp_packet_aborts
+
 * ✅ `/sys/class/nvme/<NAME>`
     * serial
     * model
