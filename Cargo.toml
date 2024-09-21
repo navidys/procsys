@@ -2,7 +2,7 @@
 name = "procsys"
 version = "0.5.0"
 edition = "2021"
-authors = ["github.com/navidys/sysmetrics"]
+authors = ["github.com/navidys/procsys"]
 license = "MIT"
 readme = "README.md"
 description = "Rust library to retrieve system, kernel, and process metrics from the pseudo-filesystems /proc and /sys"
