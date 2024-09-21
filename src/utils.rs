@@ -132,3 +132,10 @@ pub fn convert_str_to_u64(value: &str) -> CollectResult<u64> {
         Err(err) => Err(MetricError::ParseIntError(value.to_string(), err)),
     }
 }
+
+pub fn convert_hex_to_u64(value: &str) -> CollectResult<u64> {
+    match u64::from_str_radix(value.strip_prefix("0x").unwrap_or_default(), 16) {
+        Ok(v) => Ok(v),
+        Err(err) => Err(MetricError::ParseIntError(value.to_string(), err)),
+    }
+}
