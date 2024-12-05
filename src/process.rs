@@ -229,7 +229,7 @@ mod tests {
         assert_eq!(sys_single_proc.wchan().unwrap(), "poll_schedule_timeout");
         assert_eq!(
             sys_single_proc.executable().unwrap(),
-            PathBuf::from("/usr/bin/vim"),
+            PathBuf::from("/usr/bin/ls"),
         );
         assert_eq!(sys_single_proc.root_dir().unwrap(), PathBuf::from("/"));
         assert_eq!(
