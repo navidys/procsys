@@ -181,6 +181,12 @@ Supported Features
         * phy-*
         * ports-*
 
+* ✅ `/sys/class/sas_port/<NAME>/`
+    * device/
+        * phy-*
+        * expander-*
+        * end_device-*
+
 * ✅ `/sys/class/scsi_tape/<NAME>/statistics`
     * write_ns
     * read_byte_cnt
