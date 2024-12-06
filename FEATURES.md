@@ -169,6 +169,13 @@ Supported Features
     * voltage_now
     * voltage_ocv
 
+* ✅ `/sys/class/sas_device/<NAME>/`
+    * sas_address
+    * device/
+        * phy-*
+        * ports-*
+        * target*/\*/block/*
+
 * ✅ `/sys/class/scsi_tape/<NAME>/statistics`
     * write_ns
     * read_byte_cnt
