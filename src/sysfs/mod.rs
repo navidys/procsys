@@ -5,6 +5,7 @@ pub mod class_nvme;
 pub mod class_power_supply;
 pub mod class_sas_device;
 pub mod class_sas_host;
+pub mod class_sas_phy;
 pub mod class_sas_port;
 pub mod class_scsi_tape;
 pub mod class_thermal;
