@@ -20,6 +20,8 @@ Supported Features
 
 * ✅ `/proc/cmdline`
 
+* ✅ `/proc/crypto`
+
 * ✅ `/proc/cpuinfo`
 
 * ✅ `/proc/loadavg`

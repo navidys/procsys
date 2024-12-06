@@ -3,6 +3,7 @@
 pub mod buddyinfo;
 pub mod cmdline;
 pub mod cpuinfo;
+pub mod crypto;
 pub mod error;
 pub mod kernel_random;
 pub mod loadavg;

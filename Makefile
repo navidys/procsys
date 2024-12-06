@@ -11,8 +11,11 @@ PRE_COMMIT = $(shell command -v bin/venv/bin/pre-commit ~/.local/bin/pre-commit 
 # Testing and validation
 #=================================================
 
+.PHONY: validate-all
+validate-all: pre-commit codespell validate test ## Validate cargo, pre-commit, codespell and test
+
 .PHONY: validate
-validate: ## Validate code
+validate: ## Validate cargo fmt and clippy
 	$(CARGO) fmt --all -- --check
 	$(CARGO) clippy -p procsys@$(CRATE_VERSION) -- -D warnings
 
