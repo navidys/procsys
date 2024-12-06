@@ -176,6 +176,11 @@ Supported Features
         * ports-*
         * target*/\*/block/*
 
+* ✅ `/sys/class/sas_host/<NAME>/`
+    * device/
+        * phy-*
+        * ports-*
+
 * ✅ `/sys/class/scsi_tape/<NAME>/statistics`
     * write_ns
     * read_byte_cnt

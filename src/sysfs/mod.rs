@@ -4,6 +4,7 @@ pub mod class_fibrechannel;
 pub mod class_nvme;
 pub mod class_power_supply;
 pub mod class_sas_device;
+pub mod class_sas_host;
 pub mod class_scsi_tape;
 pub mod class_thermal;
 pub mod class_watchdog;
