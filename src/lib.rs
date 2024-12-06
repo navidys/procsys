@@ -21,4 +21,4 @@ pub mod process_ns;
 pub mod softirqs;
 pub mod swaps;
 pub mod sysfs;
-pub mod utils;
+mod utils;
