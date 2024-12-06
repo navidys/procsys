@@ -9,3 +9,5 @@ repos:
       - id: check-byte-order-marker
       - id: check-executables-have-shebangs
       - id: check-merge-conflict
+
+exclude: ^test_data/fixtures.ttar$
