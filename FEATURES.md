@@ -187,6 +187,24 @@ Supported Features
         * expander-*
         * end_device-*
 
+* ✅ `/sys/class/sas_phy/<NAME>/`
+    * sas_address
+    * device/
+        * port
+    * device_type
+    * initiator_port_protocols
+    * invalid_dword_count
+    * loss_of_dword_sync_count
+    * maximum_linkrate
+    * maximum_linkrate_hw
+    * minimum_linkrate
+    * minimum_linkrate_hw
+    * negotiated_linkrate
+    * phy_identifier
+    * phy_reset_problem_count
+    * running_disparity_error_count
+    * target_port_protocols
+
 * ✅ `/sys/class/scsi_tape/<NAME>/statistics`
     * write_ns
     * read_byte_cnt
