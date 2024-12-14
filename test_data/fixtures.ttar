@@ -1099,6 +1099,16 @@ TCP       1984  93064  1225378   yes     320   yes  kernel      y  y  y  y  y  y
 NETLINK   1040     16      -1   NI       0   no   kernel      n  n  n  n  n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
 Mode: 444
 # ttar - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Path: fixtures/proc/net/unix
+Lines: 6
+Num       RefCount Protocol Flags    Type St Inode Path
+0000000000000001: 00000002 00000000 00010000 0001 01 3442596 /var/run/postgresql/.s.PGSQL.5432
+0000000000000002: 0000000a 00000000 00010000 0005 01 10061 /run/udev/control
+0000000000000003: 00000007 00000000 00000000 0002 01 12392 /dev/log
+0000000000000004: 00000003 00000000 00000000 0001 03 4787297 /var/run/postgresql/.s.PGSQL.5432
+0000000000000005: 00000003 00000000 00000000 0001 03 5091797
+Mode: 644
+# ttar - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Path: fixtures/proc/net/wireless
 Lines: 4
 Inter-| sta-|   Quality        |   Discarded packets               | Missed

@@ -32,6 +32,7 @@ Supported Features
     * dev
     * protocols
     * wireless
+    * unix
 
 * ✅ `/proc/sys/kernel/random`
     * entropy_avail
