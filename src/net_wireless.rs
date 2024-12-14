@@ -84,7 +84,7 @@ fn collect_from(filename: &str) -> CollectResult<Vec<Wireless>> {
 
         let mut wireless = Wireless::new();
         wireless.name = fields[0].trim_matches(':').to_string();
-        wireless.status = fields[1].parse::<u64>().unwrap_or_default();
+        wireless.status = u64::from_str_radix(fields[1], 16).unwrap_or_default();
 
         let quality_link = fields[2].trim_end_matches(".");
         wireless.quality_link = quality_link.parse::<i64>().unwrap_or_default();
@@ -133,7 +133,7 @@ mod tests {
                     assert_eq!(netw.missed_beacon, 10);
                 }
                 "wlan1" => {
-                    assert_eq!(netw.status, 10);
+                    assert_eq!(netw.status, 16);
                     assert_eq!(netw.quality_link, 9);
                     assert_eq!(netw.quality_level, 8);
                     assert_eq!(netw.quality_noise, 7);
