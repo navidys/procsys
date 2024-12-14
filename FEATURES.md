@@ -31,6 +31,7 @@ Supported Features
 * ✅ `/proc/net/`
     * dev
     * protocols
+    * wireless
 
 * ✅ `/proc/sys/kernel/random`
     * entropy_avail

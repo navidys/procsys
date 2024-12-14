@@ -1099,6 +1099,14 @@ TCP       1984  93064  1225378   yes     320   yes  kernel      y  y  y  y  y  y
 NETLINK   1040     16      -1   NI       0   no   kernel      n  n  n  n  n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
 Mode: 444
 # ttar - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Path: fixtures/proc/net/wireless
+Lines: 4
+Inter-| sta-|   Quality        |   Discarded packets               | Missed
+ face | tus | link level noise |  nwid  crypt   frag  retry   misc | beacon
+ wlan0: 0001    2.    3.    4.       5      6      7      8      9       10
+ wlan1: 0010    9     8.    7.       6      5      4      3      2        1
+Mode: 644
+# ttar - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Path: fixtures/proc/softirqs
 Lines: 11
                     CPU0       CPU1
