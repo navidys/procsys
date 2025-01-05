@@ -1,4 +1,6 @@
-# procsys [![][img_crates]][crates] [![][img_doc]][doc] [![][img_codecov]][codecov]
+# procsys
+
+[![][img_crates]][crates] [![][img_doc]][doc] [![][img_codecov]][codecov] ![img_test] [![][img_awesome]][awesome]
 
 Rust library to retrieve system, kernel, and process metrics from the pseudo-filesystems /proc and /sys.
 
@@ -39,7 +41,10 @@ Licensed under the [MIT License](https://github.com/navidys/procsys/blob/main/LI
 [img_crates]: https://img.shields.io/crates/v/procsys.svg
 [img_doc]: https://img.shields.io/badge/rust-documentation-blue.svg
 [img_codecov]: https://codecov.io/gh/navidys/procsys/branch/main/graph/badge.svg
+[img_test]: https://github.com/navidys/procsys/workflows/validation/badge.svg
+[img_awesome]: https://awesome.re/mentioned-badge.svg
 
 [crates]: https://crates.io/crates/procsys
 [doc]: https://docs.rs/procsys/
 [codecov]: https://codecov.io/gh/navidys/procsys
+[awesome]: https://github.com/rust-unofficial/awesome-rust/
