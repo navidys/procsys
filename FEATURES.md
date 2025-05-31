@@ -32,8 +32,9 @@ Supported Features
     * arp
     * dev
     * protocols
-    * wireless
+    * sockstat
     * unix
+    * wireless
 
 * ✅ `/proc/sys/kernel/random`
     * entropy_avail

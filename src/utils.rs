@@ -146,3 +146,10 @@ pub fn convert_hex_to_i32(value: &str) -> CollectResult<i32> {
         Err(err) => Err(MetricError::ParseIntError(value.to_string(), err)),
     }
 }
+
+pub fn convert_str_to_isize(value: &str) -> CollectResult<isize> {
+    match value.parse::<isize>() {
+        Ok(c) => Ok(c),
+        Err(err) => Err(MetricError::ParseIntError(value.to_string(), err)),
+    }
+}
