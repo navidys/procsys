@@ -10,6 +10,7 @@ description = "Rust library to retrieve system, kernel, and process metrics from
 [dependencies]
 env_logger = "0.11.3"
 log = "0.4.21"
+mac_address = { version = "1.1.8", features = ["serde"] }
 regex = "1.10.6"
 serde = { version = "1.0.203", features = ["derive"] }
 serde_json = "1.0.117"

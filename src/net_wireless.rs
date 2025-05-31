@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use serde::Serialize;
 
 use crate::{
@@ -65,6 +67,11 @@ fn collect_from(filename: &str) -> CollectResult<Vec<Wireless>> {
     let mut netwireless: Vec<Wireless> = Vec::new();
 
     let mut line_index = 0;
+
+    if !Path::new(filename).exists() {
+        return Ok(netwireless);
+    }
+
     for line in utils::read_file_lines(filename)? {
         line_index += 1;
 

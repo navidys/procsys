@@ -83,6 +83,11 @@ fn collect_from(dirname: &str) -> CollectResult<HashMap<String, SASPhy>> {
     let mut sas_phys: HashMap<String, SASPhy> = HashMap::new();
     let sas_phy_path = PathBuf::from(dirname);
 
+    let re_port = match Regex::new(r"^port-[0-9:]+$") {
+        Ok(r) => r,
+        Err(err) => return Err(MetricError::RegexError(err)),
+    };
+
     for sas_phy_item in utils::list_dir_content(&sas_phy_path, "", "sas_phy") {
         let mut sas_phy = SASPhy::new();
         let mut sas_phy_item_path = sas_phy_path.clone();
@@ -96,10 +101,6 @@ fn collect_from(dirname: &str) -> CollectResult<HashMap<String, SASPhy>> {
                             .unwrap_or_default();
                 }
                 "device" => {
-                    let re_port = match Regex::new(r"^port-[0-9:]+$") {
-                        Ok(r) => r,
-                        Err(err) => return Err(MetricError::RegexError(err)),
-                    };
                     let mut sas_phy_ports_path = sas_phy_item_path.clone();
                     sas_phy_ports_path.push("device");
                     sas_phy_ports_path.push("port");
