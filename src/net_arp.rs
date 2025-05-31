@@ -15,7 +15,7 @@ const ATF_USE_TRAILERS: i32 = 0x10;
 const ATF_NETMASK: i32 = 0x20;
 const ATF_DONT_PUBLISH: i32 = 0x40;
 
-/// NetDev contains a network device information parsed from /proc/net/arp
+/// ARPEntry contains a network device information parsed from /proc/net/arp
 #[derive(Debug, Serialize, Clone)]
 pub struct ARPEntry {
     pub ip_address: net::IpAddr,
