@@ -29,6 +29,7 @@ Supported Features
 * ✅ `/proc/meminfo`
 
 * ✅ `/proc/net/`
+    * arp
     * dev
     * protocols
     * wireless

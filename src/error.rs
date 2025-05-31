@@ -38,6 +38,9 @@ pub enum MetricError {
 
     /// Regex error
     RegexError(regex::Error),
+
+    /// General parse error
+    ParseError(String),
 }
 
 impl fmt::Display for MetricError {
@@ -60,6 +63,7 @@ impl fmt::Display for MetricError {
             MetricError::ProcessNotFound(ref pid) => write!(f, "process (pid={}) not found", pid),
             MetricError::PathNotFound(ref p) => write!(f, "path ({:?}) not found", p),
             MetricError::ByteConvertError(ref unit) => write!(f, "invalid unit: {}", unit),
+            MetricError::ParseError(ref msg) => write!(f, "parse error: {}", msg),
             MetricError::RegexError(ref e) => write!(f, "regex error: {}", e),
             MetricError::InvalidFieldNumberError(ref title, ref num, ref fields) => {
                 write!(f, "invalid {} fields number {}: {:?}", title, num, fields)
