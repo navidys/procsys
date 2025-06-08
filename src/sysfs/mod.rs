@@ -1,6 +1,7 @@
 pub mod class_cooling;
 pub mod class_dmi;
 pub mod class_fibrechannel;
+pub mod class_infiniband;
 pub mod class_nvme;
 pub mod class_power_supply;
 pub mod class_sas_device;
