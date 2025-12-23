@@ -19,12 +19,8 @@ fn collect_from(filename: &str, base_path: &Path) -> CollectResult<Vec<String>> 
 
     let bootcmd = utils::collect_info_string(filename, base_path)?;
 
-    if bootcmd.is_some() {
-        boot_cmdline = bootcmd
-            .unwrap()
-            .split_whitespace()
-            .map(str::to_string)
-            .collect();
+    if let Some(bootval) = bootcmd {
+        boot_cmdline = bootval.split_whitespace().map(str::to_string).collect();
     }
 
     Ok(boot_cmdline)
